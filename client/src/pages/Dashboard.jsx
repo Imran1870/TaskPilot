@@ -109,12 +109,12 @@ export const Dashboard = () => {
     fetchCircuitStatus();
   }, [fetchTasks, fetchCircuitStatus]);
 
-  // "Next autonomous check" countdown — counts down to next 5-minute boundary
+  // "Next autonomous check" countdown — counts down to next 30-minute boundary
   useEffect(() => {
     const computeSecondsToNextTick = () => {
       const now = new Date();
-      const secondsIntoFiveMin = (now.getMinutes() % 5) * 60 + now.getSeconds();
-      return 300 - secondsIntoFiveMin; // seconds until next 5-min mark
+      const secondsIntoThirtyMin = (now.getMinutes() % 30) * 60 + now.getSeconds();
+      return 1800 - secondsIntoThirtyMin; // seconds until next 30-min mark
     };
     setNextTickSeconds(computeSecondsToNextTick());
     const interval = setInterval(() => {

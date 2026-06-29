@@ -113,7 +113,7 @@ The TaskPilot autonomous agent requires a periodic trigger to process ticks, eva
 ```bash
 # Change live-backend-url and shared-tick-secret to match your deployment
 gcloud scheduler jobs create http taskpilot-agent-tick \
-  --schedule="*/5 * * * *" \
+  --schedule="*/30 * * * *" \
   --uri="YOUR_LIVE_BACKEND_URL/api/agent/tick" \
   --http-method="POST" \
   --headers="x-agent-secret=YOUR_SHARED_AGENT_TICK_SECRET,Content-Type=application/json" \

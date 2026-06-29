@@ -34,13 +34,13 @@ Replace the placeholders with your real values:
 ```bash
 gcloud scheduler jobs create http last-minute-agent-tick \
   --location=us-central1 \
-  --schedule="*/5 * * * *" \
+  --schedule="*/30 * * * *" \
   --uri="https://YOUR_CLOUD_RUN_SERVICE_URL/api/agent/tick" \
   --http-method=POST \
   --headers="Content-Type=application/json,x-agent-secret=YOUR_AGENT_TICK_SECRET" \
   --message-body='{"lookAheadHours": 24}' \
   --time-zone="UTC" \
-  --description="Autonomous agent tick: OBSERVE→DECIDE→ACT loop for Last-Minute Life Saver"
+  --description="Autonomous agent tick: OBSERVE→DECIDE→ACT loop for TaskPilot"
 ```
 
 ### Parameters:

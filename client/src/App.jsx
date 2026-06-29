@@ -6,6 +6,7 @@ import { Layout } from './components/Layout.jsx';
 import { Login } from './pages/Login.jsx';
 import { Register } from './pages/Register.jsx';
 import { Dashboard } from './pages/Dashboard.jsx';
+import { Home } from './pages/Home.jsx';
 import { ToastContainer } from './components/ToastContainer.jsx';
 
 // Route-based code splitting (Performance optimization)
@@ -22,6 +23,17 @@ const PageLoader = () => (
     </div>
   </div>
 );
+
+// Auth-based route helpers
+const HomeRoute = () => {
+  const user = useAuthStore((state) => state.user);
+  return user ? <Navigate to="/dashboard" replace /> : <Home />;
+};
+
+const FallbackRoute = () => {
+  const user = useAuthStore((state) => state.user);
+  return <Navigate to={user ? "/dashboard" : "/"} replace />;
+};
 
 export default function App() {
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -116,7 +128,8 @@ export default function App() {
       <ToastContainer />
       <BrowserRouter>
         <Routes>
-          {/* Public auth routes */}
+          {/* Public routes */}
+          <Route path="/" element={<HomeRoute />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
@@ -148,7 +161,7 @@ export default function App() {
           </Route>
 
           {/* Fallback routing */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<FallbackRoute />} />
         </Routes>
       </BrowserRouter>
     </>
