@@ -22,6 +22,7 @@ import {
   fetchCalendarEvents,
 } from '../services/calendarService.js';
 import { asyncHandler } from '../middleware/errorMiddleware.js';
+import { config } from '../../config/index.js';
 
 // ─── GET AUTH URL ─────────────────────────────────────────────────────────────
 /**
@@ -54,21 +55,21 @@ export const handleOAuthCallback = asyncHandler(async (req, res) => {
   // User denied permission
   if (error) {
     console.warn(`[Calendar] OAuth denied by user ${userId}: ${error}`);
-    return res.redirect(`${process.env.CLIENT_URL}/calendar?error=access_denied`);
+    return res.redirect(`${config.clientUrl}/calendar?error=access_denied`);
   }
 
   if (!code || !userId) {
-    return res.redirect(`${process.env.CLIENT_URL}/calendar?error=invalid_callback`);
+    return res.redirect(`${config.clientUrl}/calendar?error=invalid_callback`);
   }
 
   // Validate userId is a valid ObjectId before DB query
   if (!/^[a-f\d]{24}$/i.test(userId)) {
-    return res.redirect(`${process.env.CLIENT_URL}/calendar?error=invalid_state`);
+    return res.redirect(`${config.clientUrl}/calendar?error=invalid_state`);
   }
 
   const user = await User.findById(userId);
   if (!user) {
-    return res.redirect(`${process.env.CLIENT_URL}/calendar?error=user_not_found`);
+    return res.redirect(`${config.clientUrl}/calendar?error=user_not_found`);
   }
 
   // Exchange code for tokens and encrypt them
@@ -103,7 +104,7 @@ export const handleOAuthCallback = asyncHandler(async (req, res) => {
   console.log(`[Calendar] User ${user.email} successfully connected Google Calendar`);
 
   // Redirect back to the calendar page in the app with success flag
-  res.redirect(`${process.env.CLIENT_URL}/calendar?connected=true`);
+  res.redirect(`${config.clientUrl}/calendar?connected=true`);
 });
 
 // ─── GET CALENDAR STATUS ──────────────────────────────────────────────────────

@@ -659,16 +659,18 @@ export const parseVoiceTranscriptDeterministic = (transcript) => {
     }
   }
 
-  // 4. Category
+  // 4. Category (matching z.enum(['assignment', 'meeting', 'bill', 'interview', 'personal', 'other']) in taskSchema)
   let category = 'personal';
-  if (/\b(work|office|job|meeting|boss|client|project|presentation|report)\b/.test(text)) {
-    category = 'work';
-  } else if (/\b(study|homework|exam|class|lecture|assignment|read|learn|quiz)\b/.test(text)) {
-    category = 'study';
-  } else if (/\b(health|doctor|exercise|gym|workout|dentist|pill|meds|run|walk)\b/.test(text)) {
-    category = 'health';
+  if (/\b(study|homework|exam|class|lecture|assignment|read|learn|quiz)\b/.test(text)) {
+    category = 'assignment';
+  } else if (/\b(work|office|job|meeting|boss|client|project|presentation|report)\b/.test(text)) {
+    category = 'meeting';
   } else if (/\b(finance|pay|bill|bank|credit|invoice|money|rent|utility)\b/.test(text)) {
-    category = 'finance';
+    category = 'bill';
+  } else if (/\b(interview|job application|recruiter|doctor|dentist|appointment)\b/.test(text)) {
+    category = 'interview';
+  } else if (/\b(health|exercise|gym|workout|pill|meds|run|walk)\b/.test(text)) {
+    category = 'other';
   }
 
   // 5. Clean Title (remove deadline details to make it a neat title)
@@ -739,7 +741,7 @@ Respond ONLY with this JSON:
   "title": "<extracted task title>",
   "description": "<any additional details mentioned>",
   "deadline": "<ISO 8601 datetime string or null>",
-  "category": "work" | "study" | "personal" | "health" | "finance" | "other",
+  "category": "assignment" | "meeting" | "bill" | "interview" | "personal" | "other",
   "priority": "low" | "medium" | "high" | "critical",
   "estimatedMinutes": <integer or null>,
   "confidence": "high" | "medium" | "low",
@@ -750,7 +752,7 @@ Respond ONLY with this JSON:
     title: z.string().min(2).max(200),
     description: z.string().nullable().optional(),
     deadline: z.string().nullable(),
-    category: z.enum(['work', 'study', 'personal', 'health', 'finance', 'other']),
+    category: z.enum(['assignment', 'meeting', 'bill', 'interview', 'personal', 'other']),
     priority: z.enum(['low', 'medium', 'high', 'critical']),
     estimatedMinutes: z.number().int().positive().nullable(),
     confidence: z.enum(['high', 'medium', 'low']),
