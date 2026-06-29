@@ -125,7 +125,7 @@ export const breakdownSchema = z.object({
 let geminiQueue = Promise.resolve();
 
 // ─── Core Call Wrapper ───────────────────────────────────────────────────────
-const callGemini = async (prompt, schema, modelName = 'gemini-2.5-flash') => {
+const callGemini = async (prompt, schema, modelName = 'gemini-3.5-flash') => {
   const model = genAI.getGenerativeModel({
     model: modelName,
     generationConfig: {

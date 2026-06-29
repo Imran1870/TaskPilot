@@ -391,18 +391,17 @@ export const Tasks = () => {
 
   // Compute color based on riskScore
   const getRiskScoreColor = (score) => {
-    if (score >= 80) return 'text-red-400 border-red-900 bg-red-950/20';
-    if (score >= 50) return 'text-amber-400 border-amber-900 bg-amber-950/20';
-    if (score >= 20) return 'text-blue-400 border-blue-900 bg-blue-950/20';
-    return 'text-slate-400 border-slate-800 bg-slate-900/40';
+    if (score >= 80) return 'text-amber-400 border-amber-900/40 bg-amber-950/20';
+    if (score >= 40) return 'text-rose-400 border-rose-900/40 bg-rose-950/20';
+    return 'text-sky-400 border-sky-900/40 bg-sky-950/20';
   };
 
   const getPriorityBadgeClass = (priority) => {
     switch (priority) {
-      case 'critical': return 'bg-red-950 text-red-400 border-red-800';
-      case 'high': return 'bg-amber-950 text-amber-400 border-amber-800';
-      case 'medium': return 'bg-blue-950 text-blue-400 border-blue-800';
-      default: return 'bg-slate-900 text-slate-400 border-slate-800';
+      case 'critical': return 'bg-amber-950/30 text-amber-400 border-amber-800/40';
+      case 'high': return 'bg-rose-950/30 text-rose-400 border-rose-800/40';
+      case 'medium': return 'bg-sky-950/30 text-sky-400 border-sky-800/40';
+      default: return 'bg-slate-900/50 text-slate-400 border-slate-800/40';
     }
   };
 
@@ -450,18 +449,18 @@ export const Tasks = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowVoiceCapture(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-900 border border-slate-750 text-xs font-semibold text-brand-400 hover:text-brand-300 hover:bg-slate-850 transition-all cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0d1527] border border-slate-800 text-xs font-bold text-cyan-400 hover:text-cyan-300 hover:bg-slate-850 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
           >
             <Mic className="h-3.5 w-3.5" />
             Voice Capture
           </button>
           
-          <div className="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-lg p-1.5 shadow-inner">
+          <div className="flex items-center gap-2 bg-[#070b14] border border-slate-850 rounded-lg p-1.5 shadow-inner">
             <button
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-semibold transition-all ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/40 ${
                 viewMode === 'list' 
-                  ? 'bg-brand-600 text-white shadow shadow-brand-900/30' 
+                  ? 'bg-cyan-600 text-white shadow shadow-cyan-900/30' 
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -470,9 +469,9 @@ export const Tasks = () => {
             </button>
             <button
               onClick={() => setViewMode('calendar')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-semibold transition-all ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/40 ${
                 viewMode === 'calendar' 
-                  ? 'bg-brand-600 text-white shadow shadow-brand-900/30' 
+                  ? 'bg-cyan-600 text-white shadow shadow-cyan-900/30' 
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -486,9 +485,9 @@ export const Tasks = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left Side: Create Task Form (Always visible) */}
-        <div className="lg:col-span-1 bg-slate-950 border border-slate-800 rounded-xl p-6 shadow-lg h-fit space-y-4">
-          <h3 className="text-md font-semibold text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-3">
-            <Plus className="h-5 w-5 text-brand-500" />
+        <div className="lg:col-span-1 bg-[#0d1527] border border-slate-800 rounded-xl p-6 shadow-lg h-fit space-y-4">
+          <h3 className="text-md font-bold text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-3">
+            <Plus className="h-5 w-5 text-cyan-400" />
             New Goal
           </h3>
 
@@ -508,11 +507,11 @@ export const Tasks = () => {
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="e.g. Pay utility invoice"
-                className={`mt-1.5 w-full bg-slate-900 border rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 ${
-                  errors.title ? 'border-red-500' : 'border-slate-700'
+                className={`mt-1.5 w-full bg-[#070b14] border rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35 ${
+                  errors.title ? 'border-rose-500' : 'border-slate-800'
                 }`}
               />
-              {errors.title && <p className="text-xs text-red-400 mt-1">{errors.title}</p>}
+              {errors.title && <p className="text-xs text-rose-400 mt-1">{errors.title}</p>}
             </div>
 
             <div>
@@ -523,7 +522,7 @@ export const Tasks = () => {
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Brief notes..."
-                className="mt-1.5 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                className="mt-1.5 w-full bg-[#070b14] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35"
               />
             </div>
 
@@ -534,7 +533,7 @@ export const Tasks = () => {
                   name="priority"
                   value={formData.priority}
                   onChange={handleChange}
-                  className="mt-1.5 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500"
+                  className="mt-1.5 w-full bg-[#070b14] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -549,7 +548,7 @@ export const Tasks = () => {
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="mt-1.5 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500"
+                  className="mt-1.5 w-full bg-[#070b14] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35"
                 >
                   <option value="personal">Personal</option>
                   <option value="assignment">Assignment</option>
@@ -568,11 +567,11 @@ export const Tasks = () => {
                 name="deadline"
                 value={formData.deadline}
                 onChange={handleChange}
-                className={`mt-1.5 w-full bg-slate-900 border rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 ${
-                  errors.deadline ? 'border-red-500' : 'border-slate-700'
+                className={`mt-1.5 w-full bg-[#070b14] border rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35 ${
+                  errors.deadline ? 'border-rose-500' : 'border-slate-800'
                 }`}
               />
-              {errors.deadline && <p className="text-xs text-red-400 mt-1">{errors.deadline}</p>}
+              {errors.deadline && <p className="text-xs text-rose-400 mt-1">{errors.deadline}</p>}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -584,7 +583,7 @@ export const Tasks = () => {
                   value={formData.estimatedMinutes}
                   onChange={handleChange}
                   min={0}
-                  className="mt-1.5 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500"
+                  className="mt-1.5 w-full bg-[#070b14] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35"
                 />
               </div>
 
@@ -594,7 +593,7 @@ export const Tasks = () => {
                   name="recurrence"
                   value={formData.recurrence}
                   onChange={handleChange}
-                  className="mt-1.5 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500"
+                  className="mt-1.5 w-full bg-[#070b14] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35"
                 >
                   <option value="none">None</option>
                   <option value="daily">Daily</option>
@@ -612,7 +611,7 @@ export const Tasks = () => {
               {formSubtasks.length > 0 && (
                 <div className="max-h-24 overflow-y-auto space-y-1.5 pr-1">
                   {formSubtasks.map((sub, idx) => (
-                    <div key={idx} className="flex items-center justify-between text-xs bg-slate-900 px-2 py-1.5 rounded border border-slate-850 text-slate-300">
+                    <div key={idx} className="flex items-center justify-between text-xs bg-[#070b14] px-2 py-1.5 rounded border border-slate-850 text-slate-300">
                       <span className="truncate">{sub.title}</span>
                       <button 
                         type="button" 
@@ -633,12 +632,12 @@ export const Tasks = () => {
                   value={newSubtaskTitle}
                   onChange={(e) => setNewSubtaskTitle(e.target.value)}
                   placeholder="e.g. Gather paperwork"
-                  className="flex-1 bg-slate-900 border border-slate-750 rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none"
+                  className="flex-1 bg-[#070b14] border border-slate-800 rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35"
                 />
                 <button
                   type="button"
                   onClick={addSubtaskToFormList}
-                  className="bg-slate-800 hover:bg-slate-700 text-slate-100 px-3 rounded text-xs font-semibold border border-slate-700"
+                  className="bg-slate-800 hover:bg-slate-700 text-slate-100 px-3 rounded text-xs font-semibold border border-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
                 >
                   Add
                 </button>
@@ -648,7 +647,7 @@ export const Tasks = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full mt-2 bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold py-2.5 rounded-lg transition-colors focus:outline-none disabled:opacity-50"
+              className="w-full mt-2 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500/40 disabled:opacity-50"
             >
               {submitting ? 'Creating task...' : 'Add Task'}
             </button>
@@ -736,115 +735,153 @@ export const Tasks = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {tasks.map((task) => (
-                    <div 
-                      key={task._id} 
-                      className={`border rounded-xl p-5 bg-slate-900 transition-all animate-fade-in ${
-                        task.status === 'done' 
-                          ? 'border-slate-850 opacity-60' 
-                          : 'border-slate-800 hover:border-slate-750'
-                      }`}
-                    >
-                      {/* Title and delete action */}
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-start gap-3">
-                          <button 
-                            type="button"
-                            onClick={() => handleToggleStatus(task)}
-                            aria-label={task.status === 'done' ? 'Mark task as pending' : 'Mark task as completed'}
-                            className="mt-1 text-brand-400 hover:text-brand-300"
-                          >
-                            {task.status === 'done' ? (
-                              <CheckSquare className="h-5 w-5" />
-                            ) : (
-                              <Square className="h-5 w-5 text-slate-600 hover:text-slate-500" />
+                  {tasks.map((task) => {
+                    const score = task.aiMeta?.riskScore || 0;
+                    const borderLeftClass = task.status === 'done'
+                      ? ''
+                      : score >= 80
+                        ? 'border-l-4 border-l-amber-500'
+                        : score >= 40
+                          ? 'border-l-4 border-l-rose-500'
+                          : 'border-l-4 border-l-sky-500';
+
+                    return (
+                      <div 
+                        key={task._id} 
+                        className={`border rounded-xl p-5 bg-[#0d1527] transition-all animate-fade-in ${borderLeftClass} ${
+                          task.status === 'done' 
+                            ? 'border-slate-850 opacity-60' 
+                            : 'border-slate-800 hover:border-slate-700 shadow-md shadow-slate-950/50'
+                        }`}
+                      >
+                        {/* Title and delete action */}
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-start gap-3">
+                            <button 
+                              type="button"
+                              onClick={() => handleToggleStatus(task)}
+                              aria-label={task.status === 'done' ? 'Mark task as pending' : 'Mark task as completed'}
+                              className="mt-1 text-cyan-400 hover:text-cyan-300"
+                            >
+                              {task.status === 'done' ? (
+                                <CheckSquare className="h-5 w-5" />
+                              ) : (
+                                <Square className="h-5 w-5 text-slate-600 hover:text-slate-500" />
+                              )}
+                            </button>
+                            <div>
+                              <h4 className={`font-bold text-slate-100 text-base ${task.status === 'done' ? 'line-through text-slate-500 font-medium' : ''}`}>
+                                {task.title}
+                              </h4>
+                              {task.description && (
+                                <p className="text-xs text-slate-400 mt-1 leading-relaxed">{task.description}</p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            {/* AI Breakdown — only for active tasks */}
+                            {task.status !== 'done' && task.status !== 'missed' && (
+                              <button
+                                type="button"
+                                onClick={() => setBreakdownTask(task)}
+                                title="AI Task Breakdown — Gemini breaks this into subtasks"
+                                aria-label="Get AI subtask breakdown for this task"
+                                className="text-indigo-400 hover:text-indigo-300 p-1.5 hover:bg-indigo-500/10 rounded-lg transition-colors"
+                              >
+                                <Sparkles className="h-4 w-4" />
+                              </button>
                             )}
-                          </button>
-                          <div>
-                            <h4 className={`font-semibold text-slate-100 text-base ${task.status === 'done' ? 'line-through text-slate-500' : ''}`}>
-                              {task.title}
-                            </h4>
-                            {task.description && (
-                              <p className="text-xs text-slate-400 mt-1 leading-relaxed">{task.description}</p>
-                            )}
+
+                            {/* Edit Task */}
+                            <button
+                              type="button"
+                              onClick={() => openEditModal(task)}
+                              title="Edit task"
+                              aria-label="Edit task details"
+                              className="text-slate-400 hover:text-slate-200 p-1.5 hover:bg-slate-500/10 rounded-lg transition-colors"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setDraftTask(task)}
+                              title="Draft delay/extension message"
+                              aria-label="Draft communication message using Gemini"
+                              className="text-cyan-400 hover:text-cyan-300 p-1.5 hover:bg-cyan-500/10 rounded-lg transition-colors"
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                            </button>
+                            
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteTask(task._id)}
+                              title="Delete task"
+                              aria-label="Delete task goal"
+                              className="text-red-400 hover:text-red-300 p-1.5 hover:bg-red-500/10 rounded-lg transition-colors"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1">
-                          {/* AI Breakdown — only for active tasks */}
-                          {task.status !== 'done' && task.status !== 'missed' && (
-                            <button
-                              type="button"
-                              onClick={() => setBreakdownTask(task)}
-                              title="AI Task Breakdown — Gemini breaks this into subtasks"
-                              aria-label="Get AI subtask breakdown for this task"
-                              className="text-indigo-400 hover:text-indigo-300 p-1.5 hover:bg-indigo-500/10 rounded-lg transition-colors"
-                            >
-                              <Sparkles className="h-4 w-4" />
-                            </button>
+                        {/* Badges and riskScore Indicator */}
+                        <div className="flex flex-wrap items-center gap-3 mt-4 text-[10px] font-bold uppercase tracking-wider">
+                          {/* Risk score badge with redundant colorblind labeling */}
+                          <span 
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full border ${getRiskScoreColor(score)}`}
+                            title={`AI Urgency Risk is ${score}%`}
+                            aria-label={`Urgency Risk is ${score} percent`}
+                          >
+                            {score >= 80 ? (
+                              <>
+                                <AlertTriangle className="h-3.5 w-3.5 animate-pulse" />
+                                <span>🔥 Danger: {score}%</span>
+                              </>
+                            ) : score >= 40 ? (
+                              <span>🌹 Alert: {score}%</span>
+                            ) : (
+                              <span>❄️ Safe: {score}%</span>
+                            )}
+                          </span>
+
+                          {/* Priority */}
+                          <span className={`px-2 py-0.5 rounded-full border ${getPriorityBadgeClass(task.priority)}`}>
+                            {task.priority}
+                          </span>
+
+                          {/* Status */}
+                          {task.status === 'missed' && (
+                            <span className="px-2 py-0.5 rounded-full border border-red-950 bg-red-950/20 text-red-400">
+                              Missed
+                            </span>
+                          )}
+                          {task.status === 'done' && (
+                            <span className="px-2 py-0.5 rounded-full border border-emerald-950 bg-emerald-950/20 text-emerald-400">
+                              Completed
+                            </span>
                           )}
 
-                          {/* Edit Task */}
-                          <button
-                            type="button"
-                            onClick={() => openEditModal(task)}
-                            title="Edit task"
-                            aria-label="Edit task details"
-                            className="text-slate-400 hover:text-slate-200 p-1.5 hover:bg-slate-500/10 rounded-lg transition-colors"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </button>
+                          {/* Category */}
+                          <span className="inline-flex items-center gap-1 text-slate-400 bg-slate-950 border border-slate-850 px-2 py-0.5 rounded-full">
+                            <Folder className="h-3 w-3 text-indigo-400" />
+                            <span className="text-[10px]">{task.category}</span>
+                          </span>
 
-                          <button
-                            type="button"
-                            onClick={() => setDraftTask(task)}
-                            title="Draft delay/extension message"
-                            aria-label="Draft communication message using Gemini"
-                            className="text-brand-400 hover:text-brand-300 p-1.5 hover:bg-brand-500/10 rounded-lg transition-colors"
-                          >
-                            <MessageSquare className="h-4 w-4" />
-                          </button>
-                          
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteTask(task._id)}
-                            title="Delete task"
-                            aria-label="Delete task goal"
-                            className="text-red-400 hover:text-red-300 p-1.5 hover:bg-red-500/10 rounded-lg transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Badges and riskScore Indicator */}
-                      <div className="flex flex-wrap items-center gap-3 mt-4 text-xs">
-                        {/* Risk score badge */}
-                        <span 
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${getRiskScoreColor(task.aiMeta?.riskScore || 0)}`}
-                          title={`AI Urgency Risk is ${task.aiMeta?.riskScore || 0}%`}
-                          aria-label={`Urgency Risk is ${task.aiMeta?.riskScore || 0} percent`}
-                        >
-                          {(task.aiMeta?.riskScore || 0) >= 80 && <AlertTriangle className="h-3.5 w-3.5 animate-pulse" />}
-                          Risk: {task.aiMeta?.riskScore || 0}%
-                        </span>
-
-                        {/* Priority */}
-                        <span className={`px-2 py-0.5 rounded-full border text-[10px] font-semibold uppercase tracking-wider ${getPriorityBadgeClass(task.priority)}`}>
-                          {task.priority}
-                        </span>
-
-                        {/* Category */}
-                        <span className="inline-flex items-center gap-1 text-slate-400 bg-slate-950 border border-slate-850 px-2 py-0.5 rounded-full">
-                          <Folder className="h-3 w-3 text-indigo-400" />
-                          <span className="text-[10px]">{task.category}</span>
-                        </span>
-
-                        {/* Deadline */}
-                        <span className="inline-flex items-center gap-1 text-slate-400 bg-slate-950 border border-slate-850 px-2 py-0.5 rounded-full">
-                          <Calendar className="h-3 w-3 text-brand-400" />
-                          <span>{new Date(task.deadline).toLocaleString()}</span>
-                        </span>
+                          {/* Deadline */}
+                          <span className={`inline-flex items-center gap-1 bg-slate-950 border px-2 py-0.5 rounded-full ${
+                            task.status === 'missed'
+                              ? 'text-red-400 border-red-950 bg-red-950/20'
+                              : 'text-slate-400 border-slate-850'
+                          }`}>
+                            <Calendar className="h-3 w-3 text-cyan-400" />
+                            <span>
+                              {task.status === 'missed'
+                                ? 'Deadline passed already'
+                                : new Date(task.deadline).toLocaleString()}
+                            </span>
+                          </span>
 
                         {/* Duration */}
                         {task.estimatedMinutes > 0 && (
@@ -883,9 +920,10 @@ export const Tasks = () => {
                       )}
 
                     </div>
-                  ))}
-                </div>
-              )}
+                  );
+                })}
+              </div>
+            )}
 
               {/* Pagination Controls */}
               {totalPages > 1 && (
@@ -976,29 +1014,32 @@ export const Tasks = () => {
                       return (
                         <div 
                           key={dayDateStr} 
-                          className="bg-slate-900 border border-slate-850 hover:border-slate-750 min-h-[95px] p-2 rounded-lg flex flex-col justify-between transition-colors overflow-hidden"
+                          className="bg-[#0d1527] border border-slate-850 hover:border-slate-700 min-h-[95px] p-2 rounded-lg flex flex-col justify-between transition-colors overflow-hidden"
                         >
-                          <div className="text-xs font-semibold text-slate-400 self-end">
+                          <div className="text-xs font-bold text-slate-400 self-end">
                             {day.getDate()}
                           </div>
                           
                           {/* Inline Tasks summary */}
                           <div className="flex-1 mt-1 space-y-1 overflow-y-auto max-h-[60px] scrollbar-thin">
                             {dayTasks.map((t) => {
-                              // color indicator based on priority or risk
-                              let indicatorColor = 'bg-brand-500';
-                              if (t.aiMeta?.riskScore >= 80) indicatorColor = 'bg-red-500';
-                              else if (t.aiMeta?.riskScore >= 50) indicatorColor = 'bg-amber-500';
+                              // color indicator based on riskScore temperature
+                              const risk = t.aiMeta?.riskScore || 0;
+                              const indicatorColor = risk >= 80 
+                                ? 'bg-amber-500' 
+                                : risk >= 40 
+                                  ? 'bg-rose-500' 
+                                  : 'bg-sky-400';
 
                               return (
                                 <div 
                                   key={t._id} 
-                                  className={`flex items-center gap-1 px-1 py-0.5 rounded text-[8px] truncate font-medium border ${
+                                  className={`flex items-center gap-1 px-1 py-0.5 rounded text-[8px] truncate font-bold border ${
                                     t.status === 'done' 
-                                      ? 'border-slate-800/40 text-slate-550 line-through bg-slate-950/20' 
-                                      : 'border-slate-800 text-slate-200 bg-slate-950/40'
+                                      ? 'border-slate-900/40 text-slate-600 line-through bg-slate-950/20' 
+                                      : 'border-slate-800 text-slate-300 bg-slate-950/40'
                                   }`}
-                                  title={`${t.title} (Risk: ${t.aiMeta?.riskScore})`}
+                                  title={`${t.title} (Risk: ${risk}%)`}
                                 >
                                   <span className={`h-1 w-1 rounded-full ${indicatorColor} flex-shrink-0`}></span>
                                   <span className="truncate">{t.title}</span>
@@ -1051,16 +1092,16 @@ export const Tasks = () => {
       {/* ── Edit Task Modal ──────────────────────────────────────────────── */}
       {editTask && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-lg mx-4 rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl overflow-hidden">
+          <div className="w-full max-w-lg mx-4 rounded-2xl border border-slate-800 bg-[#0d1527] shadow-2xl overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
               <div className="flex items-center gap-2">
-                <Pencil className="h-4 w-4 text-brand-400" />
+                <Pencil className="h-4 w-4 text-cyan-400" />
                 <h2 className="text-sm font-bold text-slate-100">Edit Task</h2>
               </div>
               <button
                 onClick={() => setEditTask(null)}
-                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-colors"
+                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
               >
                 <XIcon className="h-4 w-4" />
               </button>
@@ -1076,11 +1117,11 @@ export const Tasks = () => {
                   value={editFormData.title}
                   onChange={handleEditChange}
                   required
-                  className={`mt-1.5 w-full bg-slate-950 border rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 ${
-                    editErrors.title ? 'border-red-500' : 'border-slate-700'
+                  className={`mt-1.5 w-full bg-[#070b14] border rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35 ${
+                    editErrors.title ? 'border-rose-500' : 'border-slate-800'
                   }`}
                 />
-                {editErrors.title && <p className="text-xs text-red-400 mt-1">{editErrors.title}</p>}
+                {editErrors.title && <p className="text-xs text-rose-400 mt-1">{editErrors.title}</p>}
               </div>
 
               <div>
@@ -1090,7 +1131,7 @@ export const Tasks = () => {
                   rows={2}
                   value={editFormData.description}
                   onChange={handleEditChange}
-                  className="mt-1.5 w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 resize-none"
+                  className="mt-1.5 w-full bg-[#070b14] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35 resize-none"
                 />
               </div>
 
@@ -1098,7 +1139,7 @@ export const Tasks = () => {
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Priority</label>
                   <select name="priority" value={editFormData.priority} onChange={handleEditChange}
-                    className="mt-1.5 w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                    className="mt-1.5 w-full bg-[#070b14] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35">
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
                     <option value="high">High</option>
@@ -1108,7 +1149,7 @@ export const Tasks = () => {
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Category</label>
                   <select name="category" value={editFormData.category} onChange={handleEditChange}
-                    className="mt-1.5 w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                    className="mt-1.5 w-full bg-[#070b14] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35">
                     <option value="personal">Personal</option>
                     <option value="assignment">Assignment</option>
                     <option value="meeting">Meeting</option>
@@ -1126,11 +1167,11 @@ export const Tasks = () => {
                   name="deadline"
                   value={editFormData.deadline}
                   onChange={handleEditChange}
-                  className={`mt-1.5 w-full bg-slate-950 border rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 ${
-                    editErrors.deadline ? 'border-red-500' : 'border-slate-700'
+                  className={`mt-1.5 w-full bg-[#070b14] border rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35 ${
+                    editErrors.deadline ? 'border-rose-500' : 'border-slate-800'
                   }`}
                 />
-                {editErrors.deadline && <p className="text-xs text-red-400 mt-1">{editErrors.deadline}</p>}
+                {editErrors.deadline && <p className="text-xs text-rose-400 mt-1">{editErrors.deadline}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -1142,13 +1183,13 @@ export const Tasks = () => {
                     min={0}
                     value={editFormData.estimatedMinutes}
                     onChange={handleEditChange}
-                    className="mt-1.5 w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500"
+                    className="mt-1.5 w-full bg-[#070b14] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35"
                   />
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Recurrence</label>
                   <select name="recurrence" value={editFormData.recurrence} onChange={handleEditChange}
-                    className="mt-1.5 w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                    className="mt-1.5 w-full bg-[#070b14] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/35">
                     <option value="none">None</option>
                     <option value="daily">Daily</option>
                     <option value="weekly">Weekly</option>
@@ -1161,14 +1202,14 @@ export const Tasks = () => {
                 <button
                   type="button"
                   onClick={() => setEditTask(null)}
-                  className="flex-1 py-2.5 rounded-xl border border-slate-700 text-slate-300 text-sm font-semibold hover:bg-slate-800 transition-colors"
+                  className="flex-1 py-2.5 rounded-xl border border-slate-800 text-slate-350 text-sm font-bold hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={editSubmitting}
-                  className="flex-1 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white text-sm font-semibold transition-colors"
+                  className="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white text-sm font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
                 >
                   {editSubmitting ? 'Saving...' : 'Save Changes'}
                 </button>

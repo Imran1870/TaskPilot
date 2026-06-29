@@ -4,15 +4,65 @@
 
 @layer base {
   body {
-    @apply antialiased bg-slate-900 text-slate-100 transition-colors duration-300;
+    @apply antialiased bg-[#090e1a] text-slate-100 transition-colors duration-300;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    letter-spacing: -0.02em;
   }
 }
 
-/* ── Custom Fade-In Animation (Micro-interactions) ── */
+/* ── Custom Animations for Agent HUD & Telemetry ── */
+@keyframes radar-sweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes telemetry-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+@keyframes double-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -20,45 +70,86 @@
   }
 }
 
+.animate-radar {
+  animation: radar-sweep 8s linear infinite;
+}
+
+.animate-spin-slow {
+  animation: telemetry-spin 12s linear infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 3s ease-in-out infinite;
+}
+
+.animate-double-pulse {
+  animation: double-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 .animate-fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── prefers-reduced-motion Safe Guards ── */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-delay: 0s !important;
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-radar,
+  .animate-spin-slow,
+  .animate-pulse-ring,
+  .animate-double-pulse {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .animate-fade-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* ── CSS theme-light Variable Overrides (Theme Toggle) ── */
 .theme-light body,
 .theme-light {
-  background-color: #f8fafc !important; /* Slate-50 app bg */
+  background-color: #f3f4f6 !important; /* Light mist app bg */
   color: #0f172a !important; /* Slate-900 text */
 }
 
-/* Override background colors */
+/* Override background colors for premium clean panel blocks */
 .theme-light .bg-slate-900 {
-  background-color: #f1f5f9 !important; /* Slate-100 sidebar/subpanels */
+  background-color: #e5e7eb !important; /* light gray panel borders */
 }
 .theme-light .bg-slate-950 {
-  background-color: #ffffff !important; /* White main panels/cards */
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05) !important;
+  background-color: #ffffff !important; /* White main cards */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
 }
 .theme-light .bg-slate-900\/60,
 .theme-light .bg-slate-900\/30,
 .theme-light .bg-slate-900\/10 {
-  background-color: rgba(241, 245, 249, 0.6) !important;
+  background-color: rgba(229, 231, 235, 0.4) !important;
 }
 .theme-light .bg-slate-950\/40,
 .theme-light .bg-slate-950\/20,
 .theme-light .bg-slate-950\/10 {
-  background-color: rgba(255, 255, 255, 0.4) !important;
+  background-color: rgba(255, 255, 255, 0.5) !important;
 }
 .theme-light .bg-slate-800 {
-  background-color: #f1f5f9 !important; /* Slate-100 badges */
+  background-color: #f3f4f6 !important;
 }
 .theme-light .bg-slate-800\/60,
 .theme-light .bg-slate-800\/40,
 .theme-light .bg-slate-800\/20 {
-  background-color: rgba(241, 245, 249, 0.6) !important;
+  background-color: rgba(243, 244, 246, 0.5) !important;
 }
 .theme-light .bg-slate-700 {
-  background-color: #e2e8f0 !important;
+  background-color: #e5e7eb !important;
 }
 
 /* Override text colors */
@@ -83,13 +174,13 @@
 
 /* Override border colors */
 .theme-light .border-slate-800 {
-  border-color: #e2e8f0 !important; /* Slate-200 */
+  border-color: #e5e7eb !important; /* Slate-200 */
 }
 .theme-light .border-slate-850 {
   border-color: #cbd5e1 !important; /* Slate-300 */
 }
 .theme-light .border-slate-700 {
-  border-color: #e2e8f0 !important;
+  border-color: #e5e7eb !important;
 }
 .theme-light .border-slate-750 {
   border-color: #cbd5e1 !important;
@@ -97,7 +188,7 @@
 .theme-light .border-slate-800\/40,
 .theme-light .border-slate-800\/60,
 .theme-light .border-slate-800\/30 {
-  border-color: rgba(226, 232, 240, 0.4) !important;
+  border-color: rgba(229, 231, 235, 0.4) !important;
 }
 
 /* Custom styles for input textboxes in Light Mode to ensure readability */
@@ -115,7 +206,7 @@
 
 /* Scrollbars for Light Mode */
 .theme-light ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f3f4f6;
 }
 .theme-light ::-webkit-scrollbar-thumb {
   background: #cbd5e1;

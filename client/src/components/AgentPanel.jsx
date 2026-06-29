@@ -3,110 +3,118 @@ import { api } from '../utils/api.js';
 import { showSuccessToast, showErrorToast } from '../store/toastStore.js';
 import {
   Brain,
-  ChevronDown,
-  ChevronUp,
   CheckCircle,
-  XCircle,
   Clock,
-  Zap,
-  AlertTriangle,
   RefreshCw,
-  Info,
   Bot,
 } from 'lucide-react';
 
 // ── Action type → display metadata ──────────────────────────────────────────
 const ACTION_META = {
-  reprioritized:       { label: 'Reprioritized',      color: 'text-amber-400',  bg: 'bg-amber-950/30 border-amber-800/40' },
-  suggested_split:     { label: 'Suggested Split',    color: 'text-blue-400',   bg: 'bg-blue-950/30 border-blue-800/40' },
-  escalated:           { label: 'Escalated',          color: 'text-red-400',    bg: 'bg-red-950/30 border-red-800/40' },
-  nudge_sent:          { label: 'Nudge Sent',         color: 'text-brand-400',  bg: 'bg-brand-950/30 border-brand-800/40' },
-  rescheduled:         { label: 'Rescheduled',        color: 'text-purple-400', bg: 'bg-purple-950/30 border-purple-800/40' },
-  drafted_message:     { label: 'Drafted Message',    color: 'text-teal-400',   bg: 'bg-teal-950/30 border-teal-800/40' },
-  ai_breakdown:        { label: 'AI Breakdown',       color: 'text-indigo-400', bg: 'bg-indigo-950/30 border-indigo-800/40' },
-  risk_updated:        { label: 'Risk Updated',       color: 'text-slate-400',  bg: 'bg-slate-900/30 border-slate-800/40' },
-  suggestion_pending:  { label: 'Suggestion',         color: 'text-orange-400', bg: 'bg-orange-950/30 border-orange-800/40' },
+  reprioritized:       { label: 'Reprioritized',      color: 'text-amber-400',  bg: 'bg-amber-950/15 border-amber-800/30' },
+  suggested_split:     { label: 'Suggested Split',    color: 'text-cyan-400',   bg: 'bg-cyan-950/10 border-cyan-800/30' },
+  escalated:           { label: 'Escalated',          color: 'text-rose-400',    bg: 'bg-rose-950/10 border-rose-800/30' },
+  nudge_sent:          { label: 'Nudge Sent',         color: 'text-sky-400',  bg: 'bg-sky-950/10 border-sky-800/30' },
+  rescheduled:         { label: 'Rescheduled',        color: 'text-cyan-400', bg: 'bg-cyan-950/10 border-cyan-800/30' },
+  drafted_message:     { label: 'Drafted Message',    color: 'text-sky-400',   bg: 'bg-sky-950/10 border-sky-800/30' },
+  ai_breakdown:        { label: 'AI Breakdown',       color: 'text-sky-400', bg: 'bg-sky-950/10 border-sky-800/30' },
+  risk_updated:        { label: 'Risk Updated',       color: 'text-slate-500',  bg: 'bg-slate-900/10 border-slate-800/30' },
+  suggestion_pending:  { label: 'Suggestion',         color: 'text-amber-400', bg: 'bg-amber-950/15 border-amber-800/30' },
 };
 
-// ── Single Log Entry Card ────────────────────────────────────────────────────
+// ── Single Log Entry Card (Telemetry/Syslog Monospace Row) ───────────────────
 const LogEntry = ({ log }) => {
   const [expanded, setExpanded] = useState(false);
-  const meta = ACTION_META[log.actionType] || ACTION_META.risk_updated;
-  const isDegraded = log.source === 'deterministic_fallback';
+  
+  // Custom monospaced status indicator
+  let tagColor = 'text-slate-500';
+  let tagLabel = '[INFO]';
+  
+  switch (log.actionType) {
+    case 'reprioritized':
+      tagColor = 'text-amber-400';
+      tagLabel = '[REPR]';
+      break;
+    case 'suggested_split':
+      tagColor = 'text-cyan-400';
+      tagLabel = '[SPLT]';
+      break;
+    case 'escalated':
+      tagColor = 'text-rose-400';
+      tagLabel = '[ESCL]';
+      break;
+    case 'nudge_sent':
+      tagColor = 'text-sky-400';
+      tagLabel = '[NUDG]';
+      break;
+    case 'rescheduled':
+      tagColor = 'text-cyan-400';
+      tagLabel = '[RSCH]';
+      break;
+    case 'drafted_message':
+      tagColor = 'text-sky-400';
+      tagLabel = '[DRFT]';
+      break;
+    case 'ai_breakdown':
+      tagColor = 'text-sky-400';
+      tagLabel = '[BRKD]';
+      break;
+    case 'risk_updated':
+      tagColor = 'text-slate-500';
+      tagLabel = '[RISK]';
+      break;
+    case 'suggestion_pending':
+      tagColor = 'text-amber-400';
+      tagLabel = '[SUGG]';
+      break;
+    default:
+      tagColor = 'text-slate-500';
+      tagLabel = '[INFO]';
+  }
+
+  const timeStr = new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   const isTaskDone = log.relatedTask?.status === 'done';
 
   return (
-    <div className={`border rounded-xl p-4 transition-all ${meta.bg} animate-fade-in ${isTaskDone ? 'opacity-60' : ''}`}>
+    <div className={`font-mono text-xs py-2 px-3 hover:bg-slate-900/40 rounded transition-colors ${isTaskDone ? 'opacity-55' : ''} border-b border-slate-900/60`}>
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          {log.autoApplied ? (
-            <Zap className={`h-4 w-4 flex-shrink-0 ${meta.color}`} title="Auto-applied by AI" />
-          ) : (
-            <Bot className={`h-4 w-4 flex-shrink-0 ${meta.color}`} title="AI suggestion" />
-          )}
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className={`text-xs font-bold uppercase tracking-wider ${meta.color}`}>
-                {meta.label}
-              </span>
-              {isDegraded && (
-                <span className="text-[9px] font-semibold uppercase tracking-wider bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded-full border border-slate-700">
-                  Fallback Mode
-                </span>
-              )}
-              {log.autoApplied && (
-                <span className="text-[9px] font-semibold uppercase tracking-wider bg-emerald-950 text-emerald-400 px-1.5 py-0.5 rounded-full border border-emerald-800">
-                  Auto-Applied
-                </span>
-              )}
-              {isTaskDone && (
-                <span className="text-[9px] font-semibold uppercase tracking-wider bg-emerald-950 text-emerald-300 px-1.5 py-0.5 rounded-full border border-emerald-800">
-                  ✅ Task Completed
-                </span>
-              )}
-            </div>
+        <div className="flex items-start gap-2 flex-1 min-w-0">
+          <span className="text-slate-600 flex-shrink-0">[{timeStr}]</span>
+          <span className={`font-bold flex-shrink-0 ${tagColor}`}>{tagLabel}</span>
+          <div className="flex-1 min-w-0">
+            <span className="text-slate-300">
+              {log.autoApplied ? 'AUTO-APPLIED' : 'SUGGESTION'}:{' '}
+              {log.actionType.replace('_', ' ').toUpperCase()}
+            </span>
             {log.relatedTask && (
-              <p className={`text-xs mt-0.5 font-medium ${isTaskDone ? 'line-through text-slate-500' : 'text-slate-300'}`}>
-                → {log.relatedTask.title}
-              </p>
+              <span className={`ml-1.5 text-slate-400 ${isTaskDone ? 'line-through text-slate-600' : ''}`}>
+                &gt; "{log.relatedTask.title}"
+              </span>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-[10px] text-slate-500">
-            {new Date(log.timestamp).toLocaleTimeString()}
-          </span>
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="text-slate-500 hover:text-slate-300 transition-colors"
-            title="Show reasoning"
-          >
-            {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </button>
-        </div>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="text-slate-500 hover:text-slate-300 transition-colors flex-shrink-0 font-mono text-[10px]"
+        >
+          {expanded ? '[-]' : '[+]'}
+        </button>
       </div>
 
-      {/* Nudge message (if exists) */}
-      {log.nudgeMessage && (
-        <div className="mt-3 bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2">
-          <p className="text-xs text-slate-300 italic leading-relaxed">💬 {log.nudgeMessage}</p>
-        </div>
-      )}
-
-      {/* Expandable reasoning */}
+      {/* Expanded reasoning */}
       {expanded && (
-        <div className="mt-3 pt-3 border-t border-slate-800/60 space-y-2">
-          <div className="flex items-start gap-2">
-            <Info className="h-3.5 w-3.5 text-slate-500 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-slate-400 leading-relaxed">
-              <span className="text-slate-300 font-semibold">Why I did this: </span>
-              {log.reasoning}
-            </p>
-          </div>
-          {log.geminiTokensUsed > 0 && (
-            <p className="text-[10px] text-slate-600">~{log.geminiTokensUsed} tokens used</p>
+        <div className="mt-2 ml-4 pl-3 border-l border-slate-800 space-y-1.5 text-slate-400 text-[11px] leading-relaxed">
+          {log.nudgeMessage && (
+            <p className="text-sky-400 italic">💬 nudge: "{log.nudgeMessage}"</p>
           )}
+          <p>
+            <span className="text-slate-500 font-bold uppercase tracking-wider text-[9px]">Reasoning:</span> {log.reasoning}
+          </p>
+          <div className="text-[10px] text-slate-600 flex gap-4">
+            <span>Source: {log.source}</span>
+            {log.geminiTokensUsed > 0 && <span>Tokens: {log.geminiTokensUsed}</span>}
+          </div>
         </div>
       )}
     </div>
@@ -132,19 +140,19 @@ const SuggestionCard = ({ suggestion, onApprove, onReject }) => {
   };
 
   return (
-    <div className="border border-orange-800/40 bg-orange-950/20 rounded-xl p-4 space-y-3 animate-fade-in">
+    <div className="border border-amber-800/30 bg-amber-950/10 rounded-xl p-4 space-y-3 animate-fade-in">
       <div className="flex items-start justify-between gap-3">
-        <div>
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-bold uppercase tracking-wider text-orange-400">
-              ⏳ Awaiting Your Approval
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+              ⏳ Awaiting Review
             </span>
-            <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${meta.color} border-current bg-transparent`}>
+            <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${meta.color} border-current bg-transparent`}>
               {meta.label}
             </span>
           </div>
           {suggestion.relatedTask && (
-            <p className="text-xs text-slate-300 mt-1 font-medium">
+            <p className="text-xs text-slate-200 mt-2 font-bold truncate">
               Task: {suggestion.relatedTask.title}
             </p>
           )}
@@ -153,39 +161,36 @@ const SuggestionCard = ({ suggestion, onApprove, onReject }) => {
           onClick={() => setExpanded(!expanded)}
           className="text-slate-500 hover:text-slate-300 transition-colors flex-shrink-0"
         >
-          {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          {expanded ? '[-]' : '[+]'}
         </button>
       </div>
 
-      {/* Reasoning preview */}
-      <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{suggestion.reasoning}</p>
+      <p className="text-xs text-slate-400 leading-relaxed font-semibold">{suggestion.reasoning}</p>
 
       {/* Proposed change details */}
       {expanded && suggestion.suggestedChange && (
-        <div className="bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2">
-          <p className="text-[10px] font-bold text-slate-500 uppercase mb-1">Proposed Change</p>
-          <pre className="text-xs text-slate-300 overflow-x-auto">
+        <div className="bg-[#070b14] border border-slate-850 rounded-lg p-3">
+          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-2">Telemetry Change Payload</p>
+          <pre className="text-[10px] font-mono text-cyan-400 overflow-x-auto">
             {JSON.stringify(suggestion.suggestedChange, null, 2)}
           </pre>
         </div>
       )}
 
       {/* Approve / Reject buttons */}
-      <div className="flex gap-2 pt-1">
+      <div className="flex gap-2.5 pt-1">
         <button
           onClick={handleApprove}
           disabled={loading}
-          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-colors disabled:opacity-50"
+          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500/40 disabled:opacity-50"
         >
-          <CheckCircle className="h-3.5 w-3.5" />
-          Apply
+          Apply Change
         </button>
         <button
           onClick={handleReject}
           disabled={loading}
-          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-colors disabled:opacity-50"
+          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-850 text-slate-400 text-xs font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500/40 disabled:opacity-50"
         >
-          <XCircle className="h-3.5 w-3.5" />
           Dismiss
         </button>
       </div>
@@ -193,17 +198,16 @@ const SuggestionCard = ({ suggestion, onApprove, onReject }) => {
   );
 };
 
-// ── Skeleton Loader (Premium Micro-interactions) ─────────────────────────────
+// ── Skeleton Loader ──────────────────────────────────────────────────────────
 const SkeletonLoader = () => (
-  <div className="space-y-3 animate-pulse">
+  <div className="space-y-2 animate-pulse">
     {[1, 2, 3].map((n) => (
-      <div key={n} className="border border-slate-800 bg-slate-900/10 rounded-xl p-4 space-y-2">
+      <div key={n} className="border border-slate-800 bg-[#0d1527]/30 rounded-lg p-3 space-y-2">
         <div className="flex justify-between items-center">
-          <div className="h-4 w-28 bg-slate-800 rounded"></div>
-          <div className="h-3 w-16 bg-slate-800 rounded"></div>
+          <div className="h-3.5 w-24 bg-slate-800 rounded"></div>
+          <div className="h-2.5 w-12 bg-slate-800 rounded"></div>
         </div>
-        <div className="h-3 w-48 bg-slate-800 rounded mt-2"></div>
-        <div className="h-2 w-32 bg-slate-800 rounded mt-1"></div>
+        <div className="h-3 w-40 bg-slate-800 rounded mt-1"></div>
       </div>
     ))}
   </div>
@@ -223,15 +227,15 @@ export const AgentPanel = () => {
         api.get('/api/agent/logs?limit=40'),
         api.get('/api/agent/pending-suggestions'),
       ]);
-      // Deduplicate logs: collapse identical actionType+task within 60s window
+      // Deduplicate logs
       const rawLogs = logsRes.data.logs || [];
-      const seen = new Map();
+      const seen = new Set();
       const deduped = rawLogs.filter((log) => {
-        const taskKey = log.relatedTask?._id || 'global';
-        const timeBucket = Math.floor(new Date(log.timestamp).getTime() / 60000); // 1-min buckets
-        const key = `${log.actionType}|${taskKey}|${timeBucket}`;
+        if (!log.relatedTask) return true;
+        const taskKey = log.relatedTask._id;
+        const key = `${log.actionType}|${taskKey}`;
         if (seen.has(key)) return false;
-        seen.set(key, true);
+        seen.add(key);
         return true;
       });
       setLogs(deduped);
@@ -268,29 +272,29 @@ export const AgentPanel = () => {
   };
 
   return (
-    <div className="bg-slate-950 border border-slate-800 rounded-xl shadow-lg overflow-hidden">
+    <div className="bg-[#0d1527] border border-slate-800 rounded-xl shadow-lg overflow-hidden flex flex-col h-[520px]">
       {/* Panel Header */}
       <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
-            <Brain className="h-5 w-5 text-brand-400" />
+          <div className="h-9 w-9 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+            <Brain className="h-5 w-5 text-cyan-400" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-slate-100">Your AI Assistant</h3>
-            <p className="text-[10px] text-slate-500">Autonomous decisions and suggestions</p>
+            <h3 className="text-sm font-bold text-slate-100">Co-Pilot Command Deck</h3>
+            <p className="text-[10px] text-slate-500 uppercase tracking-wider font-mono">Telemetry Logs & Operations</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           {suggestions.length > 0 && (
-            <span className="bg-orange-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-              {suggestions.length} pending
+            <span className="bg-amber-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+              {suggestions.length} pending review
             </span>
           )}
           <button
             onClick={fetchData}
             disabled={logsLoading}
-            className="p-1.5 text-slate-500 hover:text-slate-200 transition-colors"
+            className="p-1.5 text-slate-500 hover:text-slate-200 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500/40 rounded-lg"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${logsLoading ? 'animate-spin' : ''}`} />
           </button>
@@ -298,32 +302,32 @@ export const AgentPanel = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-800">
+      <div className="flex border-b border-slate-800 font-display">
         {['suggestions', 'history'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wider transition-colors ${
+            className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-all focus:outline-none ${
               activeTab === tab
-                ? 'text-brand-400 border-b-2 border-brand-500 bg-brand-500/5'
-                : 'text-slate-500 hover:text-slate-300'
+                ? 'text-cyan-400 border-b-2 border-cyan-500 bg-cyan-500/5'
+                : 'text-slate-500 hover:text-slate-350'
             }`}
           >
-            {tab === 'suggestions' ? `Pending (${suggestions.length})` : 'AI History'}
+            {tab === 'suggestions' ? `Awaiting Actions (${suggestions.length})` : 'Telemetry Syslog'}
           </button>
         ))}
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
+      <div className="flex-1 p-4 space-y-3 overflow-y-auto bg-[#070b14]/40">
         {logsLoading ? (
           <SkeletonLoader />
         ) : activeTab === 'suggestions' ? (
           suggestions.length === 0 ? (
-            <div className="py-10 text-center">
-              <CheckCircle className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
-              <p className="text-sm text-slate-400 font-medium">All clear!</p>
-              <p className="text-xs text-slate-600 mt-1">No pending suggestions. Your agent is watching.</p>
+            <div className="py-16 text-center">
+              <CheckCircle className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
+              <p className="text-sm text-slate-300 font-bold">ALL SYSTEMS NOMINAL</p>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">No pending actions. The agent is scanning telemetry.</p>
             </div>
           ) : (
             suggestions.map((s) => (
@@ -337,18 +341,18 @@ export const AgentPanel = () => {
           )
         ) : (
           logs.length === 0 ? (
-            <div className="py-10 text-center">
+            <div className="py-16 text-center">
               <Clock className="h-8 w-8 text-slate-700 mx-auto mb-2" />
-              <p className="text-sm text-slate-400 font-medium">No agent history yet</p>
-              <p className="text-xs text-slate-600 mt-1">Trigger a tick or wait for the scheduler.</p>
+              <p className="text-sm text-slate-300 font-bold">NO LOG ENTRIES DETECTED</p>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">Trigger an Agent tick to populate historical actions.</p>
             </div>
           ) : (
-            logs.map((log) => <LogEntry key={log._id} log={log} />)
+            <div className="space-y-1">
+              {logs.map((log) => <LogEntry key={log._id} log={log} />)}
+            </div>
           )
         )}
       </div>
     </div>
   );
 };
-
-

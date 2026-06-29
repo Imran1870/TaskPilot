@@ -20,6 +20,8 @@ import {
   Timer,
   ChevronRight,
   Siren,
+  Brain,
+  Bot,
 } from 'lucide-react';
 
 export const Dashboard = () => {
@@ -38,9 +40,15 @@ export const Dashboard = () => {
 
   const fetchTasks = useCallback(async () => {
     try {
-      const response = await api.get('/api/tasks');
+      const response = await api.get('/api/tasks?limit=100');
       if (response.data.success) {
-        setTasks(response.data.tasks);
+        // Filter out tasks where the deadline has passed or status is 'missed' (except completed tasks)
+        const filtered = (response.data.tasks || []).filter((t) => {
+          if (t.status === 'done') return true;
+          const isOverdue = new Date(t.deadline) <= new Date();
+          return t.status !== 'missed' && !isOverdue;
+        });
+        setTasks(filtered);
       }
     } catch (err) {
       console.error('Error fetching tasks for dashboard', err);
@@ -67,6 +75,9 @@ export const Dashboard = () => {
           setRescueQueue([]);
           setRescueTask(null);
         }
+      } else {
+        setRescueQueue([]);
+        setRescueTask(null);
       }
     } catch (err) {
       console.error('Error checking rescue eligible tasks', err);
@@ -258,51 +269,51 @@ export const Dashboard = () => {
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-slate-950 border border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
+        <div className="bg-[#0d1527] border border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
           <div>
-            <p className="text-xs font-medium text-slate-400">Total Tasks</p>
-            <p className="text-3xl font-bold mt-1 text-slate-100">{loading ? 'â€”' : totalTasks}</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Tasks</p>
+            <p className="text-3xl font-extrabold mt-1 text-slate-100">{loading ? '—' : totalTasks}</p>
           </div>
-          <div className="h-10 w-10 bg-brand-500/10 rounded-lg flex items-center justify-center text-brand-400 border border-brand-500/20">
+          <div className="h-10 w-10 bg-slate-900 rounded-lg flex items-center justify-center text-sky-400 border border-slate-850">
             <ListTodo className="h-5 w-5" />
           </div>
         </div>
 
-        <div className="bg-slate-950 border border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
+        <div className="bg-[#0d1527] border border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
           <div>
-            <p className="text-xs font-medium text-slate-400">Active</p>
-            <p className="text-3xl font-bold mt-1 text-slate-100">{loading ? 'â€”' : pendingTasks}</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active</p>
+            <p className="text-3xl font-extrabold mt-1 text-slate-100">{loading ? '—' : pendingTasks}</p>
           </div>
-          <div className="h-10 w-10 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-400 border border-amber-500/20">
+          <div className="h-10 w-10 bg-slate-900 rounded-lg flex items-center justify-center text-cyan-400 border border-slate-850">
             <Clock className="h-5 w-5" />
           </div>
         </div>
 
-        <div className="bg-slate-950 border border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
+        <div className="bg-[#0d1527] border border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
           <div>
-            <p className="text-xs font-medium text-slate-400">Completed</p>
-            <p className="text-3xl font-bold mt-1 text-slate-100">{loading ? 'â€”' : completedTasks}</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Completed</p>
+            <p className="text-3xl font-extrabold mt-1 text-slate-100">{loading ? '—' : completedTasks}</p>
           </div>
-          <div className="h-10 w-10 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+          <div className="h-10 w-10 bg-slate-900 rounded-lg flex items-center justify-center text-emerald-400 border border-slate-850">
             <CheckCircle2 className="h-5 w-5" />
           </div>
         </div>
 
         <div className={`border rounded-xl p-5 flex items-center justify-between shadow-lg transition-colors ${
           criticalTasks.length > 0
-            ? 'bg-red-950/20 border-red-800/40'
-            : 'bg-slate-950 border-slate-800'
+            ? 'bg-amber-950/10 border-amber-800/30'
+            : 'bg-[#0d1527] border-slate-800'
         }`}>
           <div>
-            <p className="text-xs font-medium text-slate-400">Critical</p>
-            <p className={`text-3xl font-bold mt-1 ${criticalTasks.length > 0 ? 'text-red-400' : 'text-slate-100'}`}>
-              {loading ? 'â€”' : criticalTasks.length}
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Critical</p>
+            <p className={`text-3xl font-extrabold mt-1 ${criticalTasks.length > 0 ? 'text-amber-400' : 'text-slate-100'}`}>
+              {loading ? '—' : criticalTasks.length}
             </p>
           </div>
           <div className={`h-10 w-10 rounded-lg flex items-center justify-center border ${
             criticalTasks.length > 0
-              ? 'bg-red-500/10 text-red-400 border-red-500/20'
-              : 'bg-slate-800 text-slate-500 border-slate-700'
+              ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+              : 'bg-slate-900 text-slate-500 border-slate-850'
           }`}>
             <AlertTriangle className="h-5 w-5" />
           </div>
@@ -312,25 +323,25 @@ export const Dashboard = () => {
       {/* ─── AI Habit Nudges — surfaced from last agent tick ───────────────── */}
       {recentNudges.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[10px] font-bold text-brand-400 uppercase tracking-wider flex items-center gap-1.5">
+          <p className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
             <Zap className="h-3 w-3" /> Agent Habit Nudges
           </p>
           {recentNudges.slice(0, 2).map((nudge, i) => (
-            <div key={nudge._id || i} className="flex items-start justify-between gap-3 bg-brand-950/20 border border-brand-800/30 rounded-xl px-4 py-3">
+            <div key={nudge._id || i} className="flex items-start justify-between gap-3 bg-cyan-950/10 border border-cyan-800/20 rounded-xl px-4 py-3">
               <div className="flex items-start gap-2">
-                <Activity className="h-4 w-4 text-brand-400 flex-shrink-0 mt-0.5" />
+                <Activity className="h-4 w-4 text-cyan-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-semibold text-brand-300">
+                  <p className="text-xs font-bold text-cyan-300">
                     {nudge.taskSnapshot?.title || 'Habit Nudge'}
                   </p>
-                  <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                  <p className="text-xs text-slate-300 mt-0.5 leading-relaxed">
                     💬 {nudge.nudgeMessage || nudge.reasoning}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setRecentNudges((prev) => prev.filter((_, idx) => idx !== i))}
-                className="p-1 text-slate-600 hover:text-slate-300 transition-colors flex-shrink-0"
+                className="p-1 text-slate-500 hover:text-slate-200 transition-colors flex-shrink-0"
               >
                 ✕
               </button>
@@ -341,27 +352,27 @@ export const Dashboard = () => {
 
       {/* Critical task alerts */}
       {criticalTasks.length > 0 && (
-        <div className="bg-red-950/20 border border-red-800/40 rounded-xl px-5 py-4 space-y-3">
+        <div className="bg-amber-950/10 border border-amber-800/30 rounded-xl px-5 py-4 space-y-3">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-red-400" />
-            <p className="text-sm font-bold text-red-300">
-              {criticalTasks.length} task{criticalTasks.length !== 1 ? 's' : ''} need immediate attention
+            <AlertTriangle className="h-4 w-4 text-amber-500" />
+            <p className="text-sm font-extrabold text-amber-300 uppercase tracking-wider">
+              🔥 {criticalTasks.length} CRITICAL TASK{criticalTasks.length !== 1 ? 'S' : ''} NEED IMMEDIATE ATTENTION
             </p>
           </div>
           <div className="space-y-2">
             {criticalTasks.slice(0, 3).map((task) => {
               const minutesLeft = Math.round((new Date(task.deadline) - Date.now()) / 60000);
               return (
-                <div key={task._id} className="flex items-center justify-between text-xs bg-red-950/30 rounded-lg px-3 py-2">
-                  <span className="text-slate-200 font-medium truncate mr-4">{task.title}</span>
-                  <span className="text-red-400 flex-shrink-0">
+                <div key={task._id} className="flex items-center justify-between text-xs bg-amber-950/20 rounded-lg px-3 py-2 border border-amber-900/30">
+                  <span className="text-slate-200 font-semibold truncate mr-4">{task.title}</span>
+                  <span className="text-amber-400 font-bold uppercase tracking-wider flex-shrink-0">
                     {minutesLeft > 0 ? `${minutesLeft}m left` : 'OVERDUE'}
                   </span>
                 </div>
               );
             })}
             {criticalTasks.length > 3 && (
-              <p className="text-xs text-red-500">+{criticalTasks.length - 3} more critical tasks</p>
+              <p className="text-[10px] text-amber-500 font-bold uppercase">+{criticalTasks.length - 3} MORE CRITICAL TASKS</p>
             )}
           </div>
         </div>
@@ -380,15 +391,15 @@ export const Dashboard = () => {
           {circuitStatus && (
             <div className={`rounded-xl p-4 border shadow-lg ${
               circuitStatus.isOpen
-                ? 'bg-red-950/20 border-red-800/40'
-                : 'bg-emerald-950/20 border-emerald-800/40'
+                ? 'bg-red-950/15 border-red-800/30'
+                : 'bg-emerald-950/15 border-emerald-800/30'
             }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {circuitStatus.isOpen
                     ? <WifiOff className="h-4 w-4 text-red-400" />
                     : <Wifi className="h-4 w-4 text-emerald-400" />}
-                  <span className="text-xs font-bold text-slate-200">
+                  <span className="text-xs font-extrabold text-slate-200 uppercase tracking-wider">
                     Gemini {circuitStatus.isOpen ? 'Fallback Mode' : 'Online'}
                   </span>
                 </div>
@@ -396,14 +407,14 @@ export const Dashboard = () => {
                   <button
                     onClick={handleResetCircuit}
                     disabled={resettingCircuit}
-                    className="flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded bg-red-800/60 hover:bg-red-700/60 text-red-300 border border-red-700/40 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-lg bg-red-800/50 hover:bg-red-700/50 text-red-300 border border-red-700/40 transition-colors disabled:opacity-50"
                   >
                     <RefreshCw className={`h-3 w-3 ${resettingCircuit ? 'animate-spin' : ''}`} />
                     Reset AI
                   </button>
                 )}
               </div>
-              <p className="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
+              <p className="text-[10px] text-slate-400 mt-1.5 leading-relaxed">
                 {circuitStatus.isOpen
                   ? `Using deterministic fallback (${circuitStatus.consecutiveFailures} failures). Click Reset to retry Gemini.`
                   : 'Gemini API active. Agent tick will use real AI analysis.'}
@@ -411,23 +422,54 @@ export const Dashboard = () => {
             </div>
           )}
 
-          {/* Agent Status */}
-          <div className="bg-slate-950 border border-slate-800 rounded-xl p-5 shadow-lg space-y-4">
+          {/* Agent Status (HUD Command Circle) */}
+          <div className="bg-[#0d1527] border border-slate-800 rounded-xl p-5 shadow-lg space-y-4">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
-                <Activity className="h-5 w-5 text-brand-400" />
+              <div className="h-9 w-9 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                <Bot className="h-5 w-5 text-cyan-400" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-slate-100">Agent Status</h3>
-                <p className="text-[10px] text-slate-500">Google Cloud Scheduler</p>
+                <h3 className="text-sm font-bold text-slate-100">Agent Co-Pilot HUD</h3>
+                <p className="text-[10px] text-slate-500">Google Cloud Scheduler Connected</p>
+              </div>
+            </div>
+
+            {/* Signature HUD SVG Radar Visual */}
+            <div className="flex justify-center py-4">
+              <div className="relative w-32 h-32 flex items-center justify-center">
+                {/* Telemetry Outer Circle */}
+                <svg className="absolute w-full h-full animate-spin-slow" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="45" stroke="#1e293b" strokeWidth="1" fill="none" strokeDasharray="5 5" />
+                  <circle cx="50" cy="50" r="40" stroke="rgba(6, 182, 212, 0.15)" strokeWidth="1.5" fill="none" />
+                  <path d="M 50,5 A 45,45 0 0,1 95,50" stroke="#06b6d4" strokeWidth="2" fill="none" strokeLinecap="round" />
+                </svg>
+                
+                {/* Radar sweep hand (Ice blue/cyan) */}
+                <div className={`absolute inset-0 rounded-full border border-dashed border-sky-500/10 ${ticking ? 'animate-radar' : 'animate-pulse-ring'}`}>
+                  <div className="absolute top-0 left-1/2 -ml-0.5 w-1 h-1/2 bg-gradient-to-t from-transparent via-cyan-500/30 to-cyan-400 rounded-full origin-bottom" style={{ transform: 'rotate(45deg)' }}></div>
+                </div>
+                
+                {/* Inner telemetry target */}
+                <div className="absolute w-20 h-20 rounded-full border border-slate-800 bg-slate-950/80 flex flex-col items-center justify-center shadow-inner shadow-cyan-900/10">
+                  {ticking ? (
+                    <Bot className="h-8 w-8 text-cyan-400 animate-bounce" />
+                  ) : rescueTask ? (
+                    <AlertTriangle className="h-8 w-8 text-amber-500 animate-pulse" />
+                  ) : (
+                    <Brain className="h-8 w-8 text-sky-400" />
+                  )}
+                  <span className="text-[8px] font-extrabold text-slate-400 mt-1 uppercase tracking-widest font-mono">
+                    {ticking ? 'Analyzing' : rescueTask ? 'Rescue' : 'Scanning'}
+                  </span>
+                </div>
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400">Status</span>
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-brand-950 text-brand-300 border border-brand-800 font-semibold">
-                  <span className="h-1.5 w-1.5 rounded-full bg-brand-400 animate-ping"></span>
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 font-bold uppercase tracking-wider text-[9px]">
+                  <span className="h-1 w-1 rounded-full bg-cyan-400 animate-ping"></span>
                   Active
                 </span>
               </div>
@@ -436,35 +478,35 @@ export const Dashboard = () => {
                 <span className="text-slate-200">Every 5 minutes</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">Loop</span>
-                <span className="text-slate-300 font-mono text-[10px]">OBSERVEâ†’DECIDEâ†’ACT</span>
+                <span className="text-slate-400">Telemetry Loop</span>
+                <span className="text-slate-300 font-mono text-[9px] font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">OBSERVE→DECIDE→ACT</span>
               </div>
               {lastTickStats && (
                 <>
                   <div className="border-t border-slate-800 pt-3 space-y-2">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Last Run</p>
+                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-bold">Last Run Diagnostic</p>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-slate-400">Tasks observed</span>
                       <span className="text-slate-200">{lastTickStats.tasksObserved}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-slate-400">Actions logged</span>
-                      <span className="text-emerald-400 font-semibold">{lastTickStats.actionsLogged}</span>
+                      <span className="text-cyan-400 font-bold">{lastTickStats.actionsLogged}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-slate-400">Duration</span>
-                      <span className="text-slate-200">{lastTickStats.tickDurationMs}ms</span>
+                      <span className="text-slate-300 font-mono">{lastTickStats.tickDurationMs}ms</span>
                     </div>
                   </div>
                 </>
               )}
             </div>
 
-            {/* Manual Tick Button â€” for demos, labeled as DEV */}
+            {/* Manual Tick Button */}
             <button
               onClick={handleManualTick}
               disabled={ticking}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-60 text-white text-sm font-semibold transition-colors shadow-lg shadow-brand-900/30"
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-60 text-white text-sm font-bold transition-colors shadow-lg shadow-cyan-900/30"
             >
               {ticking ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -473,13 +515,13 @@ export const Dashboard = () => {
               )}
               {ticking ? 'Agent Running...' : 'Run Agent Tick'}
             </button>
-            <p className="text-[9px] text-slate-600 text-center -mt-2">
-              DEV: In production, Cloud Scheduler triggers this automatically
+            <p className="text-[9px] text-slate-600 text-center -mt-2 uppercase tracking-wide font-semibold">
+              DEV: Scheduled Cloud Scheduler trigger simulates background ticks
             </p>
           </div>
 
           {/* How it works */}
-          <div className="bg-slate-950 border border-slate-800 rounded-xl p-5 shadow-lg">
+          <div className="bg-[#0d1527] border border-slate-800 rounded-xl p-5 shadow-lg">
             <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">How the Agent Works</h4>
             <div className="space-y-3">
               {[
@@ -488,19 +530,19 @@ export const Dashboard = () => {
                 { icon: <CheckCircle2 className="h-3.5 w-3.5" />, label: 'ACT', desc: 'Low-risk changes auto-apply; High-risk ones appear as Pending suggestions for your approval' },
               ].map((step, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <div className="h-6 w-6 rounded-md bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 flex-shrink-0 mt-0.5">
+                  <div className="h-6 w-6 rounded-md bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 flex-shrink-0 mt-0.5">
                     {step.icon}
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-brand-400 uppercase tracking-wider">{step.label}</p>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">{step.desc}</p>
+                    <p className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">{step.label}</p>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">{step.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
             <div className="mt-4 pt-3 border-t border-slate-800">
               <p className="text-[10px] text-slate-500 leading-relaxed">
-                After running: check the <strong className="text-brand-400">AI History</strong> tab to see what the agent decided, and the <strong className="text-orange-400">Pending</strong> tab for suggestions awaiting your approval.
+                After running: check the <strong className="text-cyan-400">AI History</strong> tab to see what the agent decided, and the <strong className="text-orange-400">Pending</strong> tab for suggestions awaiting your approval.
               </p>
             </div>
           </div>

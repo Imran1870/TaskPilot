@@ -17,6 +17,25 @@ export const getTasks = asyncHandler(async (req, res) => {
     limit = 10 
   } = req.query;
 
+  // Auto-transition overdue tasks to missed status
+  try {
+    const overdueTasks = await Task.find({
+      owner: req.user._id,
+      status: { $in: ['pending', 'in-progress'] },
+      deadline: { $lte: new Date() },
+      deletedAt: null
+    });
+    if (overdueTasks.length > 0) {
+      for (const t of overdueTasks) {
+        t.status = 'missed';
+        await t.save();
+        console.log(`[Overdue Check] Task "${t.title}" auto-marked as missed.`);
+      }
+    }
+  } catch (err) {
+    console.error('[Overdue Check] Error updating tasks:', err.message);
+  }
+
   // Build query: only owned and non-soft-deleted tasks
   const query = { 
     owner: req.user._id,
@@ -172,14 +191,13 @@ export const updateTask = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Soft delete task (preserve historical logs)
+// @desc    Permanently delete task and related logs
 // @route   DELETE /api/tasks/:id
 // @access  Private
 export const deleteTask = asyncHandler(async (req, res) => {
   const task = await Task.findOne({
     _id: req.params.id,
     owner: req.user._id,
-    deletedAt: null
   });
 
   if (!task) {
@@ -187,13 +205,20 @@ export const deleteTask = asyncHandler(async (req, res) => {
     throw new Error('Task not found');
   }
 
-  // Soft delete
-  task.deletedAt = new Date();
-  await task.save();
+  // Hard delete
+  await Task.deleteOne({ _id: req.params.id });
+
+  // Clean up related AgentLog entries referencing this task
+  try {
+    const { AgentLog } = await import('../models/AgentLog.js');
+    await AgentLog.deleteMany({ relatedTask: req.params.id });
+  } catch (err) {
+    console.error(`[Delete Cleanup] Error clearing logs for task ${req.params.id}:`, err.message);
+  }
 
   res.json({
     success: true,
-    message: 'Task soft-deleted successfully',
+    message: 'Task and related logs permanently deleted successfully',
   });
 });
 
