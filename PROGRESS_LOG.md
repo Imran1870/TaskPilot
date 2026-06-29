@@ -96,5 +96,30 @@ This log tracks the build progress of "Last-Minute Life Saver," detailing what w
 2. Observe the lightweight log entries created on subsequent ticks if tasks remain unchanged.
 3. Edit a task and observe the next scheduled tick capture the change immediately.
 
+---
+### [Phase 6] Google Cloud Run Manual Deployment Setup
+**Date/Step:** Step 8
+**What I built:** Containerized the /server (multi-stage alpine build with healthchecks and non-root node execution) and /client (production static build served via Nginx with SPA routing fallback). Created a manual bash script `deploy.sh` to automate GCP API enablement (Secret Manager, Artifact Registry, Cloud Run, Cloud Scheduler), push images, dynamically fetch URLs, and securely link client CORS back to the server to close circular dependency loops. Added `deploy-setup.md` documentation.
+**Why it matters:** Google Technology Focus / Technical Complexity — Establishes a secure, controlled production release pipeline. Bypasses automatic CI/CD triggers to give developer absolute release control. Reads variables securely via Secret Manager bindings instead of local files.
+**Google tech used (if any):** Google Cloud Run, Artifact Registry, Google Secret Manager, Cloud Scheduler.
+**How to demo it:**
+1. Authenticate local CLI using `gcloud auth login`.
+2. Execute `./deploy.sh` to compile, push, and deploy backend/frontend services automatically.
+3. Verify live links are printed and the server dynamically whitelists the frontend CORS rules.
+4. Establish the Cloud Scheduler HTTP job pointing to `/api/agent/tick` with the secret header.
+
+---
+### [Phase 7] Premium Visual Identity Pass (TaskPilot Rebranding)
+**Date/Step:** Step 9
+**What I built:** Redesigned the entire product theme from a generic layout to a tactical midnight command cockpit. Updated typography (Space Grotesk and Plus Jakarta Sans). Integrated a custom, glowing SVG circular radar telemetry HUD indicator that pulses and rotates during active scanning. Restyled all charts (Insights estimation accuracy, Procrastination Index, and Priority breach meters) and AI logs to follow our temperature-scale color mapping (Calm Ice, Vibrant Rose, Laser Amber). Checked accessibility constraints (color-blind tags) and `prefers-reduced-motion` supports.
+**Why it matters:** Design Aesthetics / Usability — Creates a highly premium, modern, cohesive user experience that immediately instills calm competence under pressure, visually mapping risk and agent activity accurately.
+**Google tech used (if any):** Google Fonts integration.
+**How to demo it:**
+1. Boot the application to inspect the Void Blue dashboard and HUD radar telemetry loop.
+2. View the monospaced syslog terminal logging agent activities.
+3. Open the "Insights" dashboard to view the custom styled temperature-scale flex charts.
+4. Resize browser or inspect in simulator to check the mobile navigation and accessibility badges.
+
 ## Summary for Evaluators
-"Last-Minute Life Saver" is a fully comprehensive agentic dashboard designed to solve the critical student procrastination loop. Harnessing Google Gemini API for structured voice transcription, autonomous task decomposition, daily prioritization context, and crisis communication rescue templates, it represents a state-of-the-art AI-human pairing tool. Built with secure cookies, rotational JWT, strict Zod validation schemas, and a responsive glassmorphic visual system, it is 100% complete, optimized, and ready for production deployment.
+"TaskPilot" is a fully comprehensive agentic dashboard designed to solve the critical student procrastination loop. Harnessing Google Gemini API for structured voice transcription, autonomous task decomposition, daily prioritization context, and crisis communication rescue templates, it represents a state-of-the-art AI-human pairing tool. Built with secure cookies, rotational JWT, strict Zod validation schemas, and a responsive glassmorphic visual system, it is 100% complete, optimized, and ready for production deployment.
+

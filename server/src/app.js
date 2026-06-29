@@ -21,8 +21,19 @@ const app = express();
 app.use(helmet());
 
 // Enable CORS with support for credentials (cookies)
+const allowedOrigins = config.nodeEnv === 'production' 
+  ? [config.clientUrl]
+  : [config.clientUrl, 'http://localhost:5173', 'http://localhost:5174'];
+
 app.use(cors({
-  origin: [config.clientUrl, 'http://localhost:5173', 'http://localhost:5174'],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl/scheduler)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS Policy Breach: Origin not whitelisted.'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-agent-secret'],

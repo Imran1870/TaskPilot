@@ -5,10 +5,16 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load env file from server root or parent directory
-dotenv.config({ path: path.join(__dirname, '../.env') });
-// fallback to root level if not in server/
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+const isProduction = !!process.env.K_SERVICE || process.env.NODE_ENV === 'production';
+
+if (isProduction) {
+  console.log('🚀 [Config] Production environment detected. Reading credentials securely via Google Secret Manager.');
+} else {
+  console.log('💻 [Config] Local development environment detected. Loading variables from .env files.');
+  // Load env file from server root or parent directory
+  dotenv.config({ path: path.join(__dirname, '../.env') });
+  dotenv.config({ path: path.join(__dirname, '../../.env') });
+}
 
 const requiredEnvVars = [
   'MONGO_URI',
