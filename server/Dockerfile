@@ -19,11 +19,12 @@ RUN npm ci --only=production
 COPY server/src ./src
 COPY server/config ./config
 
-# Copy shared models/schemas/helpers (required by controllers/taskController.js etc.)
-COPY shared ../shared
+# Copy shared to /app/shared and symlink it to /shared so relative imports can resolve dependencies
+COPY shared ./shared
+RUN ln -s /app/shared /shared
 
 # Run as non-root user 'node'
-RUN chown -R node:node /app
+RUN chown -R node:node /app /shared
 USER node
 
 EXPOSE 8080

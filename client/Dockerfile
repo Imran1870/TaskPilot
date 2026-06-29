@@ -12,8 +12,11 @@ ENV VITE_API_URL=$VITE_API_URL
 COPY client/package*.json ./
 RUN npm ci
 
-# Copy shared and client sources
-COPY shared ../shared
+# Copy shared to /app/shared and symlink it to /shared so build-time imports resolve dependencies
+COPY shared ./shared
+RUN ln -s /app/shared /shared
+
+# Copy client source code
 COPY client/ ./
 
 # Run static asset build compilation
