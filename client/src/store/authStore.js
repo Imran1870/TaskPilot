@@ -11,18 +11,6 @@ export const useAuthStore = create((set, get) => ({
   isLoading: true, // starts loading while we check session
 
   setAccessToken: (token) => set({ accessToken: token, isAuthenticated: true }),
-
-  loginWithToken: async (token) => {
-    set({ accessToken: token, isAuthenticated: true, isLoading: true });
-    try {
-      const userRes = await api.get('/api/auth/me');
-      set({ user: userRes.data.user, isAuthenticated: true, isLoading: false });
-      return { success: true };
-    } catch (err) {
-      set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false });
-      return { success: false, error: 'Failed to retrieve profile' };
-    }
-  },
   
   clearAuth: () => set({ 
     user: null, 

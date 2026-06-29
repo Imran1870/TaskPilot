@@ -26,7 +26,6 @@ const requiredEnvVars = [
   'GOOGLE_CLIENT_ID',
   'GOOGLE_CLIENT_SECRET',
   'GOOGLE_CALENDAR_REDIRECT_URI',
-  'GOOGLE_LOGIN_REDIRECT_URI',
   'CALENDAR_TOKEN_ENCRYPTION_KEY',
 ];
 
@@ -55,7 +54,6 @@ export const config = {
   googleClientId: process.env.GOOGLE_CLIENT_ID,
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
   googleCalendarRedirectUri: process.env.GOOGLE_CALENDAR_REDIRECT_URI,
-  googleLoginRedirectUri: process.env.GOOGLE_LOGIN_REDIRECT_URI,
   calendarTokenEncryptionKey: process.env.CALENDAR_TOKEN_ENCRYPTION_KEY,
   smtpUser: process.env.SMTP_USER || 'jeeaspirant191@gmail.com',
   smtpPass: process.env.SMTP_PASS || 'drys ucuu uwvl hetc',
