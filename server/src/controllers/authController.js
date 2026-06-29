@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { User } from '../models/User.js';
 import { config } from '../../config/index.js';
 import { asyncHandler } from '../middleware/errorMiddleware.js';
+import { google } from 'googleapis';
 
 // Helper to hash tokens using fast secure SHA-256
 const hashToken = (token) => {
@@ -231,4 +232,99 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
     success: true,
     user: req.user,
   });
+});
+
+// Google OAuth Login Integration
+const createGoogleLoginOAuth2Client = () => {
+  return new google.auth.OAuth2(
+    config.googleClientId,
+    config.googleClientSecret,
+    config.googleLoginRedirectUri
+  );
+};
+
+// @desc    Redirect to Google OAuth consent screen for Login
+// @route   GET /api/auth/google
+// @access  Public
+export const getGoogleLoginUrl = asyncHandler(async (req, res) => {
+  const oauth2Client = createGoogleLoginOAuth2Client();
+  const scopes = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'openid'
+  ];
+
+  const authUrl = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: scopes,
+    prompt: 'consent'
+  });
+
+  res.json({
+    success: true,
+    authUrl
+  });
+});
+
+// @desc    Google OAuth Callback for Login
+// @route   GET /api/auth/google/callback
+// @access  Public
+export const handleGoogleLoginCallback = asyncHandler(async (req, res) => {
+  const { code, error } = req.query;
+
+  if (error) {
+    console.warn(`[GoogleAuth] Login denied: ${error}`);
+    return res.redirect(`${config.clientUrl}/login?error=access_denied`);
+  }
+
+  if (!code) {
+    return res.redirect(`${config.clientUrl}/login?error=invalid_callback`);
+  }
+
+  const oauth2Client = createGoogleLoginOAuth2Client();
+  
+  // Exchange code for tokens
+  const { tokens } = await oauth2Client.getToken(code);
+  oauth2Client.setCredentials(tokens);
+
+  // Fetch user profile from Google userinfo endpoint
+  const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
+  const { data: profile } = await oauth2.userinfo.get();
+
+  if (!profile.email) {
+    return res.redirect(`${config.clientUrl}/login?error=no_email_provided`);
+  }
+
+  const email = profile.email.toLowerCase().trim();
+  const name = profile.name || profile.given_name || 'Google User';
+
+  // Find or create user
+  let user = await User.findOne({ email });
+  if (!user) {
+    // Generate a random password hash since they authenticate via Google
+    const randomPassword = crypto.randomBytes(32).toString('hex');
+    const salt = await bcrypt.genSalt(12);
+    const passwordHash = await bcrypt.hash(randomPassword, salt);
+
+    user = await User.create({
+      name,
+      email,
+      passwordHash,
+      timezone: 'UTC' // default
+    });
+    console.log(`[GoogleAuth] Created new user: ${email}`);
+  }
+
+  // Generate tokens
+  const { accessToken, refreshToken } = generateTokens(user._id);
+
+  // Store SHA-256 hash of refresh token
+  user.refreshTokenHash = hashToken(refreshToken);
+  await user.save();
+
+  // Set HTTP-only cookie
+  setRefreshTokenCookie(res, refreshToken);
+
+  // Redirect client back with the short-lived access token
+  res.redirect(`${config.clientUrl}/login?token=${accessToken}`);
 });

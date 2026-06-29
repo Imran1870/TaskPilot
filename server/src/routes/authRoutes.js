@@ -4,7 +4,9 @@ import {
   loginUser, 
   refreshAccessToken, 
   logoutUser,
-  getCurrentUser
+  getCurrentUser,
+  getGoogleLoginUrl,
+  handleGoogleLoginCallback
 } from '../controllers/authController.js';
 import { validateSchema } from '../middleware/validateMiddleware.js';
 import { 
@@ -25,5 +27,9 @@ router.post('/login', loginRateLimiter, validateSchema(loginSchema), loginUser);
 router.post('/refresh', authRateLimiter, refreshAccessToken);
 router.post('/logout', authRateLimiter, logoutUser);
 router.get('/me', requireAuth, getCurrentUser);
+
+// Google Sign-In Integrations
+router.get('/google', getGoogleLoginUrl);
+router.get('/google/callback', handleGoogleLoginCallback);
 
 export default router;
