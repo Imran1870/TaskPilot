@@ -100,7 +100,7 @@ This log tracks the build progress of "Last-Minute Life Saver," detailing what w
 ### [Phase 6] Google Cloud Run Manual Deployment Setup
 **Date/Step:** Step 8
 **What I built:** Containerized the /server (multi-stage alpine build with healthchecks and non-root node execution) and /client (production static build served via Nginx with SPA routing fallback). Created a manual bash script `deploy.sh` to automate GCP API enablement, push images, and securely link CORS. 
-* **Docker Dependency Resolve:** Fixed build-stage dependency resolution by copying `shared` inside `/app/shared` and symlinking `/shared` in both Dockerfiles, resolving the `zod` package loading crash. Added `deploy-setup.md` documentation.
+* **Docker Dependency Resolve:** Fixed build-stage dependency resolution by copying `shared` inside `/app/shared` and symlinking `/shared` in both Dockerfiles, resolving the `zod` package loading crash. Added root welcome `GET /` and favicon `GET /favicon.ico` route handlers to eliminate 404 error logging clutter. Added `deploy-setup.md` documentation.
 **Why it matters:** Google Technology Focus / Technical Complexity — Establishes a secure, controlled production release pipeline. Bypasses automatic CI/CD triggers to give developer absolute release control. Reads variables securely via Secret Manager bindings instead of local files.
 **Google tech used (if any):** Google Cloud Run, Artifact Registry, Google Secret Manager, Cloud Scheduler.
 **How to demo it:**

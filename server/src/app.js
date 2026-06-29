@@ -50,6 +50,14 @@ app.use(mongoSanitize());
 // Sanitize data against XSS
 app.use(xss());
 
+// Welcome route at root to prevent 404 errors
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to the TaskPilot Command Deck API', status: 'online', version: '1.0.0' });
+});
+
+// Favicon route to prevent browser request 404 errors
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // Simple healthcheck route
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', env: config.nodeEnv });
