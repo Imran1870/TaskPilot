@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased bg-slate-900 text-slate-100 transition-colors duration-300;
+  }
+}
+
+/* ── Custom Fade-In Animation (Micro-interactions) ── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── CSS theme-light Variable Overrides (Theme Toggle) ── */
+.theme-light body,
+.theme-light {
+  background-color: #f8fafc !important; /* Slate-50 app bg */
+  color: #0f172a !important; /* Slate-900 text */
+}
+
+/* Override background colors */
+.theme-light .bg-slate-900 {
+  background-color: #f1f5f9 !important; /* Slate-100 sidebar/subpanels */
+}
+.theme-light .bg-slate-950 {
+  background-color: #ffffff !important; /* White main panels/cards */
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05) !important;
+}
+.theme-light .bg-slate-900\/60,
+.theme-light .bg-slate-900\/30,
+.theme-light .bg-slate-900\/10 {
+  background-color: rgba(241, 245, 249, 0.6) !important;
+}
+.theme-light .bg-slate-950\/40,
+.theme-light .bg-slate-950\/20,
+.theme-light .bg-slate-950\/10 {
+  background-color: rgba(255, 255, 255, 0.4) !important;
+}
+.theme-light .bg-slate-800 {
+  background-color: #f1f5f9 !important; /* Slate-100 badges */
+}
+.theme-light .bg-slate-800\/60,
+.theme-light .bg-slate-800\/40,
+.theme-light .bg-slate-800\/20 {
+  background-color: rgba(241, 245, 249, 0.6) !important;
+}
+.theme-light .bg-slate-700 {
+  background-color: #e2e8f0 !important;
+}
+
+/* Override text colors */
+.theme-light .text-slate-100 {
+  color: #0f172a !important; /* Slate-900 */
+}
+.theme-light .text-slate-200 {
+  color: #1e293b !important; /* Slate-800 */
+}
+.theme-light .text-slate-300 {
+  color: #334155 !important; /* Slate-700 */
+}
+.theme-light .text-slate-400 {
+  color: #475569 !important; /* Slate-600 */
+}
+.theme-light .text-slate-500 {
+  color: #64748b !important; /* Slate-500 */
+}
+.theme-light .text-slate-600 {
+  color: #94a3b8 !important; /* Slate-400 */
+}
+
+/* Override border colors */
+.theme-light .border-slate-800 {
+  border-color: #e2e8f0 !important; /* Slate-200 */
+}
+.theme-light .border-slate-850 {
+  border-color: #cbd5e1 !important; /* Slate-300 */
+}
+.theme-light .border-slate-700 {
+  border-color: #e2e8f0 !important;
+}
+.theme-light .border-slate-750 {
+  border-color: #cbd5e1 !important;
+}
+.theme-light .border-slate-800\/40,
+.theme-light .border-slate-800\/60,
+.theme-light .border-slate-800\/30 {
+  border-color: rgba(226, 232, 240, 0.4) !important;
+}
+
+/* Custom styles for input textboxes in Light Mode to ensure readability */
+.theme-light input,
+.theme-light select,
+.theme-light textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+.theme-light input::placeholder,
+.theme-light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Scrollbars for Light Mode */
+.theme-light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+.theme-light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.theme-light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

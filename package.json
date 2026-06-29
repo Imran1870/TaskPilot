@@ -1,0 +1,18 @@
+{
+  "name": "last-minute-life-saver",
+  "version": "1.0.0",
+  "description": "AI-powered productivity companion that proactively plans, prioritizes, and helps users complete tasks before deadlines.",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\""
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

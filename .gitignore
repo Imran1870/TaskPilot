@@ -1,0 +1,17 @@
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.example
+
+# Dependencies
+node_modules/
+
+# Logs
+logs
+*.log
+
+# Build folders
+dist/
+build/
