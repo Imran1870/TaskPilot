@@ -25,8 +25,12 @@ export const Sidebar = () => {
       {/* Desktop Sidebar (hidden on mobile) */}
       <aside className="hidden md:flex w-64 bg-[#0d1527] border-r border-slate-800 flex flex-col min-h-screen text-slate-300 transition-colors duration-300">
         {/* Brand Header */}
-        <div className="h-16 flex items-center px-6 border-b border-slate-800 gap-2">
-          <Clock className="text-cyan-400 h-5 w-5" />
+        <div className="h-16 flex items-center px-6 border-b border-slate-800 gap-2.5">
+          <img 
+            src="https://cdn-icons-png.flaticon.com/512/10731/10731298.png" 
+            className="h-6 w-6 object-contain" 
+            alt="TaskPilot Logo" 
+          />
           <span className="font-extrabold text-lg bg-gradient-to-r from-cyan-400 to-sky-400 bg-clip-text text-transparent font-display tracking-tight">
             TaskPilot
           </span>

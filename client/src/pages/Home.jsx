@@ -18,7 +18,7 @@ export const Home = () => {
         <div className="flex items-center gap-2.5">
           <img 
             src="https://cdn-icons-png.flaticon.com/512/10731/10731298.png" 
-            className="h-8 w-8 object-contain filter drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]" 
+            className="h-10 w-10 object-contain" 
             alt="TaskPilot Logo" 
           />
           <span className="font-extrabold text-xl bg-gradient-to-r from-cyan-400 to-sky-400 bg-clip-text text-transparent font-display tracking-tight">
@@ -55,7 +55,7 @@ export const Home = () => {
           Autonomous Co-Pilot Active
         </div>
 
-        <h1 className="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-cyan-400 via-indigo-200 to-purple-400 bg-clip-text text-transparent font-display tracking-tight leading-tight max-w-3xl">
+        <h1 className="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-cyan-500 via-violet-500 to-indigo-600 bg-clip-text text-transparent font-display tracking-tight leading-tight max-w-3xl">
           Take control of your tasks. Autonomously.
         </h1>
 

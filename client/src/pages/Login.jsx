@@ -64,7 +64,7 @@ export const Login = () => {
           <Link to="/" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
             <img 
               src="https://cdn-icons-png.flaticon.com/512/10731/10731298.png" 
-              className="h-9 w-9 object-contain filter drop-shadow-[0_0_8px_rgba(6,182,212,0.35)]" 
+              className="h-11 w-11 object-contain" 
               alt="TaskPilot Logo" 
             />
             <span className="text-3xl font-extrabold bg-gradient-to-r from-cyan-400 to-sky-400 bg-clip-text text-transparent font-display tracking-tight">

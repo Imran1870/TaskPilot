@@ -120,6 +120,7 @@
 
 /* ── CSS theme-light Variable Overrides (Theme Toggle) ── */
 .theme-light body,
+.theme-light .bg-\[\#090e1a\],
 .theme-light {
   background-color: #f3f4f6 !important; /* Light mist app bg */
   background-image: none !important;
