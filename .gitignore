@@ -15,3 +15,7 @@ logs
 # Build folders
 dist/
 build/
+
+#md files
+GOOGLE_TECH_USAGE.md
+PROGRESS_LOG.md
