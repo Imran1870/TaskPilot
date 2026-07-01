@@ -181,7 +181,7 @@ export const Dashboard = () => {
           },
         },
       );
-      const stats = res.data.stats;
+      const stats = res.data.stats || { actionsLogged: 0, tasksObserved: 0, tickDurationMs: res.data.tickDurationMs || 0 };
       setLastTickStats(stats);
       showSuccessToast(
         `✅ Agent tick complete — ${stats.actionsLogged} action(s) logged across ${stats.tasksObserved} task(s). Check "AI History" tab.`
