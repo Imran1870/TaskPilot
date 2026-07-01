@@ -176,13 +176,20 @@ export const runAgentTick = asyncHandler(async (req, res) => {
     return res.json({
       success: true,
       message: 'No tasks in observation window — nothing to process',
-      tickDurationMs: Date.now() - tickStart,
+      stats: {
+        tasksObserved: 0,
+        usersProcessed: 0,
+        actionsLogged: 0,
+        geminiCallsMade: 0,
+        tickDurationMs: Date.now() - tickStart
+      }
     });
   }
 
   // Group tasks by user for context-aware Gemini prompts
   const tasksByUser = {};
   tasksToAnalyze.forEach((task) => {
+    if (!task.owner) return;
     const userId = task.owner._id.toString();
     if (!tasksByUser[userId]) {
       tasksByUser[userId] = { user: task.owner, tasks: [] };
@@ -342,13 +349,58 @@ export const runAgentTick = asyncHandler(async (req, res) => {
       console.warn(`[AgentTick] Habit guard check failed for user ${user.name}:`, habitErr.message);
     }
 
-    if (!isForce && !hasTaskChanges && !hasHabitChanges) {
-      console.log(`[AgentTick] Skip guard triggered: No task or habit changes for user ${user.name}. Skipping Gemini.`);
+    // Evaluate if notifications for all at-risk tasks are already sent
+    let everyTaskAlreadyNotified = true;
+    for (const task of tasks) {
+      const timeRemainingMin = (new Date(task.deadline) - now) / 60000;
+      const estimated = task.estimatedMinutes || 30;
+      const currentNotificationState = task.aiMeta?.notificationSent || 'none';
+
+      if (timeRemainingMin > 0) {
+        const isCriticalAlert = 
+          task.priority === 'critical' &&
+          (now.getTime() + estimated * 60000 + 2 * 60 * 60 * 1000 > new Date(task.deadline).getTime());
+
+        const isNonCriticalAlert = 
+          task.priority !== 'critical' && 
+          (estimated > timeRemainingMin || timeRemainingMin <= 240);
+
+        if (isCriticalAlert) {
+          if (currentNotificationState !== 'email_and_push') {
+            everyTaskAlreadyNotified = false;
+            break;
+          }
+        } else if (isNonCriticalAlert) {
+          if (currentNotificationState !== 'push_only' && currentNotificationState !== 'email_and_push') {
+            everyTaskAlreadyNotified = false;
+            break;
+          }
+        }
+      }
+    }
+
+    // Check login activity duration (3 or more days)
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    const hasNoLoginActivity = !user.lastLoginAt || new Date(user.lastLoginAt) <= threeDaysAgo;
+
+    // Check if any task deadline falls within next 24 hours
+    const hasTaskIn24h = tasks.some(task => {
+      const timeRemainingMin = (new Date(task.deadline) - now) / 60000;
+      return timeRemainingMin > 0 && timeRemainingMin <= 24 * 60;
+    });
+    const noTaskIn24h = !hasTaskIn24h;
+
+    // All five conditions must be true to skip
+    const shouldSkip = !hasTaskChanges && !hasHabitChanges && everyTaskAlreadyNotified && hasNoLoginActivity && noTaskIn24h;
+
+    if (!isForce && shouldSkip) {
+      console.log(`[AgentTick] Smart skip guard triggered for user ${user.name}. Skipping Gemini.`);
       const savedLog = await AgentLog.create({
         user: user._id,
         relatedTask: null,
         actionType: 'risk_updated',
-        reasoning: "Autonomous check: no changes detected in task or habit data since last evaluation.",
+        reasoning: "tick: no changes detected, skipped AI evaluation",
         source: 'deterministic_fallback',
         autoApplied: true,
         isPendingSuggestion: false,
@@ -356,6 +408,11 @@ export const runAgentTick = asyncHandler(async (req, res) => {
         geminiTokensUsed: 0
       });
       totalLogs.push(savedLog._id);
+
+      // Update user lastCheckedAt timestamp
+      await User.findByIdAndUpdate(user._id, {
+        $set: { lastCheckedAt: now }
+      });
 
       for (const task of tasks) {
         await Task.findByIdAndUpdate(task._id, {
@@ -502,10 +559,7 @@ export const runAgentTick = asyncHandler(async (req, res) => {
     // Reuses habitsNeedingNudge calculated in the skip guard/force check above
     try {
       for (const habit of habitsNeedingNudge) {
-        if (totalGeminiCalls >= MAX_GEMINI_CALLS_PER_TICK) break;
-
         const nudgeMsg = await generateHabitNudge(habit, { name: user.name });
-        totalGeminiCalls++;
 
         await AgentLog.create({
           user: user._id,
@@ -513,11 +567,11 @@ export const runAgentTick = asyncHandler(async (req, res) => {
           actionType: 'nudge_sent',
           reasoning: `Habit streak at risk: "${habit.title}" (${habit.streakCount}-day streak, not completed today). Nudge sent to preserve streak.`,
           nudgeMessage: nudgeMsg,
-          source: 'gemini',
+          source: 'deterministic_fallback',
           autoApplied: true,
           isPendingSuggestion: false,
           wasAccepted: true,
-          geminiTokensUsed: 50, // estimated
+          geminiTokensUsed: 0,
         });
 
         console.log(`[AgentTick] Habit nudge sent for "${habit.title}" (${habit.streakCount}-day streak)`);
