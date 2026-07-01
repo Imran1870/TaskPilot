@@ -780,34 +780,31 @@ Respond ONLY with this JSON:
  * Google Technology: Gemini API — habit motivation, not generic reminders
  * Called by: agentController.runAgentTick (habit check loop)
  */
-export const generateHabitNudge = async (habit, userContext) => {
-  if (isCircuitOpen()) {
-    return `🔥 Don't break your ${habit.streakCount}-day streak for "${habit.title}"! Log it before midnight.`;
+export const generateHabitNudge = async (habit, userContext = {}) => {
+  const streakCount = habit.streakCount || 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const completedToday = habit.completionLog?.some((date) => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime() === today.getTime();
+  });
+
+  // Check if incomplete today and streak is at risk
+  const isAtRisk = streakCount > 0 && !completedToday;
+  if (!isAtRisk) {
+    return `Let's work on your habit "${habit.title}" today!`;
   }
 
-  const prompt = `
-Write a personalized, motivating nudge for a user about to break a habit streak.
-NOT generic — be specific to the habit and streak length.
+  // Determine time of day based on current hour
+  const hr = new Date().getHours();
+  let timeOfDay = 'today';
+  if (hr < 12) timeOfDay = 'this morning';
+  else if (hr < 17) timeOfDay = 'this afternoon';
+  else timeOfDay = 'this evening';
 
-HABIT: "${habit.title}"
-CURRENT STREAK: ${habit.streakCount} days
-TARGET FREQUENCY: ${habit.targetFrequency}
-USER NAME: ${userContext.name || 'there'}
-
-Write a 1-2 sentence message that:
-1. Acknowledges their specific streak (mention the number)
-2. Is encouraging but creates mild urgency (not fear-based)
-3. Mentions what completing it today means for their streak
-
-Respond ONLY with JSON: { "message": "<your nudge>" }`;
-
-  try {
-    const habitNudgeSchema = z.object({ message: z.string().min(10).max(300) });
-    const { data } = await callGemini(prompt, habitNudgeSchema);
-    return data.message;
-  } catch {
-    return `🔥 Keep your ${habit.streakCount}-day streak alive! Complete "${habit.title}" before midnight tonight.`;
-  }
+  return `Your "${habit.title}" streak is at ${streakCount} days — you still have time ${timeOfDay} to keep it going!`;
 };
 
 // ─── PHASE 4: Pattern-Aware Agent Tick ───────────────────────────────────────
