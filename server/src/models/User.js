@@ -78,6 +78,14 @@ const userSchema = new mongoose.Schema({
       default: null,
     },
   },
+  lastLoginAt: {
+    type: Date,
+    default: Date.now,
+  },
+  lastCheckedAt: {
+    type: Date,
+    default: Date.now,
+  },
   pushSubscription: {
     endpoint: { type: String, default: null },
     keys: {
