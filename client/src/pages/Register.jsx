@@ -14,7 +14,7 @@ export const Register = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(true);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -210,36 +210,6 @@ export const Register = () => {
               {errors.confirmPassword && (
                 <p className="mt-1 text-xs text-red-400 font-mono">{errors.confirmPassword}</p>
               )}
-            </div>
-
-            {/* Terms & Conditions (Match switch style from mockup) */}
-            <div className="flex items-center justify-between gap-4 pt-2">
-              <span className="text-xs text-slate-400 leading-relaxed">
-                Accept our{' '}
-                <a href="#" className="text-violet-400 hover:underline">
-                  Terms of Service
-                </a>{' '}
-                and{' '}
-                <a href="#" className="text-violet-400 hover:underline">
-                  Privacy Policy
-                </a>.
-              </span>
-              <button
-                type="button"
-                onClick={() => setTermsAccepted(!termsAccepted)}
-                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-500/35 ${
-                  termsAccepted ? 'bg-violet-600' : 'bg-slate-800'
-                }`}
-                role="switch"
-                aria-checked={termsAccepted}
-              >
-                <span
-                  aria-hidden="true"
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    termsAccepted ? 'translate-x-5' : 'translate-x-0'
-                  }`}
-                />
-              </button>
             </div>
 
             {/* Submit Button */}
