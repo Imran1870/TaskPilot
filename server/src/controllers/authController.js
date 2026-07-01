@@ -108,6 +108,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 
   // Store SHA-256 hash of refresh token
   user.refreshTokenHash = hashToken(refreshToken);
+  user.lastLoginAt = new Date();
   await user.save();
 
   // Set cookie
